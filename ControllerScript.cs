@@ -54,6 +54,9 @@ public class ControllerScript : MonoBehaviour {
 	WorldControllerScript m_WorldHandler = null;
     AttachToPlayerScript m_AttachToPlayer = null;
 	LocalGravityScript m_LocalGravityScript = null;
+	public AudioClip m_JumpingSound;
+	public AudioClip m_SwitchWorldSound;
+
 
     /*Animation for changeGravity*/
 
@@ -216,6 +219,7 @@ public class ControllerScript : MonoBehaviour {
 
         if (Input.GetButtonDown("Switch World"))
 		{
+			audio.PlayOneShot(m_SwitchWorldSound);
 			m_WorldHandler.SwitchWorld();
             m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber()); 
 		}
@@ -233,6 +237,7 @@ public class ControllerScript : MonoBehaviour {
 		
         if(Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
 		{
+			audio.PlayOneShot(m_JumpingSound);
             vforce += Vector3.up * m_Jump;
             m_JumpHandler.OnJump();
 		}

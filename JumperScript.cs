@@ -22,6 +22,7 @@ public class JumperScript : MonoBehaviour {
 	private int m_CollideCount = 0;
     private int m_JumpCharge = 0;
     private int m_MaxJumpCharge = 0;
+	public AudioClip m_HittingObjectSound;
 
 	
 	void Start () 
@@ -110,6 +111,7 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider other)
     {
+		audio.PlayOneShot(m_HittingObjectSound);
 		if(other.GetComponent<CheckpointScript>() != null)
 			return; //Ignore Checkpoint !
 		
