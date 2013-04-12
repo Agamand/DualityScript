@@ -113,6 +113,6 @@ public class DoorWithSwitchScript : MonoBehaviour {
             m_RelPosition = m_Door.transform.localPosition;
         }
         else
-            m_IsChangingState = true;
+            m_IsChangingState = false;
     }
 }
