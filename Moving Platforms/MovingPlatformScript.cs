@@ -26,12 +26,9 @@ using System.Collections;
 
 public class MovingPlatformScript : MonoBehaviour {
 
-    public float m_MinIncrement;
-    public float m_MaxIncrement;
-    public enum axisEnum { x, y, z };
-    public axisEnum m_Axis;
+    public Vector3 m_MinIncrement;
+    public Vector3 m_MaxIncrement;
     public float m_Speed;
-    public bool m_StartBackwards = false;
     public bool m_ChangeColor = false;
     private Vector3 m_InitialPosition;
     private WorldControllerScript m_WorldControler;
@@ -41,6 +38,8 @@ public class MovingPlatformScript : MonoBehaviour {
     private Renderer[] m_BumpersRenderer;
     private int m_LastUpdateWorldNumber;
     private bool m_IsMoving;
+	private AnimationClip m_Forward;
+	private float m_MaxTime;
 
 	// Use this for initialization
 	void Start () {
@@ -57,14 +56,57 @@ public class MovingPlatformScript : MonoBehaviour {
         m_BumpersRenderer[1] = gameObject.transform.FindChild("bumperRight").GetComponent<Renderer>();
         m_LastUpdateWorldNumber = 0;
         m_IsMoving = true;
+		
+		gameObject.AddComponent<Animation>();
+		gameObject.animation.animatePhysics = true;
+        m_Forward = new AnimationClip();
+		
+
+		var curvex = new AnimationCurve();
+		var curvey = new AnimationCurve();
+		var curvez = new AnimationCurve();
+		var minpos = m_InitialPosition+m_MinIncrement;
+		var maxpos = m_InitialPosition-m_MaxIncrement;
+		float dist = (minpos-maxpos).magnitude;
+		m_MaxTime = dist/m_Speed;
+		curvex.AddKey(0f, minpos.x);
+		curvex.AddKey(dist/m_Speed, maxpos.x);
+		curvey.AddKey(0f, minpos.y);
+		curvey.AddKey(dist/m_Speed, maxpos.y);
+		curvez.AddKey(0f, minpos.z);
+		curvez.AddKey(dist/m_Speed, maxpos.z);
+		m_Forward.wrapMode = WrapMode.ClampForever;
+
+        m_Forward.SetCurve("", typeof(Transform), "localPosition.x", curvex);
+		m_Forward.SetCurve("", typeof(Transform), "localPosition.y", curvey);
+		m_Forward.SetCurve("", typeof(Transform), "localPosition.z", curvez);
+        this.animation.AddClip(m_Forward, "Forward");
+		this.animation.Play("Forward");
 	}
-	
+		
 	// Update is called once per frame
 	void Update () {
         m_CurrentWorldNumber = m_WorldControler.GetCurrentWorldNumber();
+		
+		if (m_CurrentWorldNumber != m_LastUpdateWorldNumber)
+		{
+			if(m_CurrentWorldNumber == 0)
+			{
+				animation["Forward"].speed = 1.0f;
+				if(animation["Forward"].time < 0.0f)
+					animation["Forward"].time = 0.0f;
+			}
+			else
+			{
+				animation["Forward"].speed = -1.0f;
+				if(animation["Forward"].time > m_MaxTime)
+					animation["Forward"].time = m_MaxTime;
+			}
+		}
+		
         if (m_CurrentWorldNumber != m_LastUpdateWorldNumber || m_IsMoving)
         {
-            if (m_CurrentWorldNumber == (m_StartBackwards == true ? 0 : 1))
+            if (m_CurrentWorldNumber == 1)
             {
                 if (m_ChangeColor)
                 {
@@ -73,14 +115,14 @@ public class MovingPlatformScript : MonoBehaviour {
                         r.material.color = Color.red;
                     }
                 }
-                if (m_RelPosition[(int)m_Axis] < m_MinIncrement)
+                /*if (m_RelPosition[(int)m_Axis] < m_MinIncrement)
                 {
                     gameObject.transform.Translate(m_Translations[(int)m_Axis] * Time.deltaTime);
                     m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
                     m_IsMoving = true;
                 }
                 else
-                    m_IsMoving = false;
+                    m_IsMoving = false;*/
             }
             else
             {
@@ -91,14 +133,14 @@ public class MovingPlatformScript : MonoBehaviour {
                         r.material.color = Color.blue;
                     }
                 }
-                if (m_RelPosition[(int)m_Axis] > m_MaxIncrement * -1)
+                /*if (m_RelPosition[(int)m_Axis] > m_MaxIncrement * -1)
                 {
                     gameObject.transform.Translate(-1 * m_Translations[(int)m_Axis] * Time.deltaTime);
                     m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
                     m_IsMoving = true;
                 }
                 else
-                    m_IsMoving = false;
+                    m_IsMoving = false;*/
             }
         }
         m_LastUpdateWorldNumber = m_CurrentWorldNumber;

@@ -26,10 +26,8 @@ using System.Collections;
 
 public class AutomatedMovingPlatformScript : MonoBehaviour {
 
-    public float m_MinIncrement;
-    public float m_MaxIncrement;
-    public enum axisEnum { x, y, z };
-    public axisEnum m_Axis;
+    public Vector3 m_MinIncrement;
+    public Vector3 m_MaxIncrement;
     public bool m_StartBackwards = false;
     public float m_Speed;
     public float m_CooldownStart = 0;
@@ -38,6 +36,10 @@ public class AutomatedMovingPlatformScript : MonoBehaviour {
     private Vector3 m_RelPosition;
     private Vector3[] m_Translations;
     private bool m_IsAtEnd = false;
+	private AnimationClip m_Forward;
+	private float m_MaxTime;
+	private AnimationState m_ForwardState;
+	private bool m_Inverse = false;
 
     // Use this for initialization
     void Start()
@@ -48,57 +50,54 @@ public class AutomatedMovingPlatformScript : MonoBehaviour {
         m_Translations[0].Set(m_Speed, 0, 0);
         m_Translations[1].Set(0, m_Speed, 0);
         m_Translations[2].Set(0, 0, m_Speed);
-    }
+		
+		gameObject.AddComponent<Animation>();
+		gameObject.animation.animatePhysics = true;
+        m_Forward = new AnimationClip();
+		
+		var curvex = new AnimationCurve();
+		var curvey = new AnimationCurve();
+		var curvez = new AnimationCurve();
+		var minpos = m_InitialPosition+m_MinIncrement;
+		var maxpos = m_InitialPosition-m_MaxIncrement;
+		float dist = (minpos-maxpos).magnitude;
+		m_MaxTime = dist/m_Speed;
+		curvex.AddKey(0f, minpos.x);
+		curvex.AddKey(dist/m_Speed, maxpos.x);
+		curvey.AddKey(0f, minpos.y);
+		curvey.AddKey(dist/m_Speed, maxpos.y);
+		curvez.AddKey(0f, minpos.z);
+		curvez.AddKey(dist/m_Speed, maxpos.z);
+		m_Forward.wrapMode = WrapMode.ClampForever;
 
-    /**
-     * CooldownStart()
-     *  --> called when the palform reaches its closer end
-     *         - waits for the amount of time given in parameter before going back to its perpetual movement
-     * */
-    IEnumerator CooldownStart()
-    {
-        yield return new WaitForSeconds(m_CooldownStart);
-        m_IsAtEnd = m_StartBackwards;
-    }
-
-    /**
-     * CooldownStart()
-     *  --> called when the palform reaches its further end
-     *         - waits for the amount of time given in parameter before going back to its perpetual movement
-     * */
-    IEnumerator CooldownEnd()
-    {
-        yield return new WaitForSeconds(m_CooldownEnd);
-        m_IsAtEnd = !m_StartBackwards;
-    }
-
-
+        m_Forward.SetCurve("", typeof(Transform), "localPosition.x", curvex);
+		m_Forward.SetCurve("", typeof(Transform), "localPosition.y", curvey);
+		m_Forward.SetCurve("", typeof(Transform), "localPosition.z", curvez);
+        this.animation.AddClip(m_Forward, "Forward");
+		this.animation.Play("Forward");
+		m_ForwardState = this.animation["Forward"];
+	}
+	
     // Update is called once per frame
     void Update()
     {
-        
-        if (m_IsAtEnd == !m_StartBackwards)
+		Debug.Log(this.animation["Forward"].time);
+        if (m_Inverse)
         {
-            if (m_RelPosition[(int)m_Axis] < m_MinIncrement)
-            {
-                gameObject.transform.Translate(m_Translations[(int)m_Axis] * Time.deltaTime);
-                m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
-            }
-            else
-            {              
-                StartCoroutine(CooldownStart());        
+            if (this.animation["Forward"].time < 0f)
+            {   
+		        m_Inverse = false;
+				this.animation["Forward"].speed = 1.0f;
+				this.animation["Forward"].time = -m_CooldownStart;       
             }
         }
         else
         {
-            if (m_RelPosition[(int)m_Axis] > m_MaxIncrement * -1)
+            if (this.animation["Forward"].time > m_MaxTime)
             {
-                gameObject.transform.Translate(-1 * m_Translations[(int)m_Axis] * Time.deltaTime);
-                m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
-            }
-            else
-            {
-                StartCoroutine(CooldownEnd());
+		        m_Inverse = true;
+				this.animation["Forward"].speed = -1.0f;
+				this.animation["Forward"].time = m_MaxTime+m_CooldownEnd;
             }
         }
     }
