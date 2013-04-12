@@ -14,15 +14,20 @@
 using UnityEngine;
 using System.Collections;
 
+
 public class LaserBeamScript : MonoBehaviour {
 
     private GameObject []m_LaserBeams;
+    private LineRenderer []m_LineRenderers;
     private GameObject m_CurrentWorld;
     private WorldControllerScript m_worldController;
 
 	// Use this for initialization
 	void Start () {
         m_LaserBeams = GameObject.FindGameObjectsWithTag("laserBeam");
+        m_LineRenderers = new LineRenderer[m_LaserBeams.Length];
+        for (int i = 0; i < m_LaserBeams.Length; i++)
+            m_LineRenderers[i] = m_LaserBeams[i].GetComponent<LineRenderer>();
         m_worldController = GameObject.Find("GameWorld").GetComponent<WorldControllerScript>();
         m_CurrentWorld = m_worldController.GetCurrentWorld();
         InitializeLasers();
@@ -33,16 +38,15 @@ public class LaserBeamScript : MonoBehaviour {
      * */
 	public void SwitchState () {
             m_CurrentWorld = m_worldController.GetCurrentWorld();
-            foreach (GameObject LaserBeam in m_LaserBeams)
+            for (int i = 0; i < m_LaserBeams.Length; i++)
             {
-                if (m_CurrentWorld.layer == LaserBeam.layer || LaserBeam.layer == 0)
+                if (m_CurrentWorld.layer == m_LaserBeams[i].layer || m_LaserBeams[i].layer == 0)
                 {
-                    LaserBeam.SetActive(true);
-
+                    m_LineRenderers[i].renderer.enabled = true;
                 }
-                else if (m_CurrentWorld.layer != LaserBeam.layer)
+                else if (m_CurrentWorld.layer != m_LaserBeams[i].layer)
                 {
-                    LaserBeam.SetActive(false);
+                    m_LineRenderers[i].renderer.enabled = false;
                 }
 
             }          
@@ -50,16 +54,16 @@ public class LaserBeamScript : MonoBehaviour {
 
     public void InitializeLasers()
     {
-        foreach (GameObject LaserBeam in m_LaserBeams)
+        for (int i = 0; i < m_LaserBeams.Length; i++)
         {
-            if (8 == LaserBeam.layer || LaserBeam.layer == 0)
+            if (8 == m_LaserBeams[i].layer || m_LaserBeams[i].layer == 0)
             {
-                LaserBeam.SetActive(true);
+                m_LineRenderers[i].renderer.enabled = true;
 
             }
-            else if (8 != LaserBeam.layer)
+            else if (8 != m_LaserBeams[i].layer)
             {
-                LaserBeam.SetActive(false);
+                m_LineRenderers[i].renderer.enabled = false;
             }
 
         }          

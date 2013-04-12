@@ -24,10 +24,7 @@ public class JumperScript : MonoBehaviour {
     private int m_MaxJumpCharge = 0;
 	public AudioClip m_HittingObjectSound;
 
-	
-	void Start () 
-	{}
-	
+		
     /**
      * IsOnGround()
      *  --> returns whether or not the player is touching the ground
@@ -111,10 +108,10 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider other)
     {
-		audio.PlayOneShot(m_HittingObjectSound);
 		if(other.GetComponent<CheckpointScript>() != null)
 			return; //Ignore Checkpoint !
-		
+        audio.PlayOneShot(m_HittingObjectSound);
+
 		
         if (m_CollideCount == 0)
         {

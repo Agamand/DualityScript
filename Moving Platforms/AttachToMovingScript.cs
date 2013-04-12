@@ -20,7 +20,7 @@ public class AttachToMovingScript : MonoBehaviour {
      * */
     void OnCollisionEnter(Collision col)
     {
-        if (col.gameObject.transform.parent.name.Equals("Player"))
+        if (col.gameObject.transform.parent != null && col.gameObject.transform.parent.CompareTag("Player"))
              col.gameObject.transform.parent.transform.parent = gameObject.transform;
         else if (col.gameObject.transform.GetComponent<AttachableObjectScript>() != null)
                 col.gameObject.transform.parent = gameObject.transform;
@@ -36,8 +36,8 @@ public class AttachToMovingScript : MonoBehaviour {
      * */
     void OnCollisionExit(Collision col)
     {
-        if (col.gameObject.transform.parent.name.Equals("Player"))
-             col.gameObject.transform.parent.transform.parent = col.gameObject.transform.parent.GetComponent<AttachableObjectScript>().GetOriginalTransform();
+        if (col.gameObject.transform.parent != null && col.gameObject.transform.parent.CompareTag("Player"))
+            col.gameObject.transform.parent.transform.parent = col.gameObject.transform.parent.GetComponent<AttachableObjectScript>().GetOriginalTransform();
         else if (col.gameObject.transform.GetComponent<AttachableObjectScript>() != null)
              col.gameObject.transform.parent = col.gameObject.transform.GetComponent<AttachableObjectScript>().GetOriginalTransform();
     }

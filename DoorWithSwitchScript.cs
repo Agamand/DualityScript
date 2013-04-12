@@ -52,20 +52,19 @@ public class DoorWithSwitchScript : MonoBehaviour {
 	// Update is called once per frame
     void Update()
     {
-        if (m_IsChangingState)
+        if (m_Switches != null && m_IsChangingState)
             CheckSwitchesState();
     }
 
     // Called  both when a switches changes its state and while the door is closing or opening
 	public void CheckSwitchesState () {
-        print("Cheking state of " + m_Switches.Length + " switches");
         if (m_Switches != null)
         {
             m_IsCleared = true;
 
-            foreach (BallStandScript m_Switch in m_Switches)
+            for (int i = 0; i < m_Switches.Length; i++)
             {
-                if (!m_Switch.GetState())
+                if (!m_Switches[i].GetState())
                     m_IsCleared = false;
             }
             if (m_IsCleared)

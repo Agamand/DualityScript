@@ -21,16 +21,15 @@ public class CheckpointScript : MonoBehaviour {
 	public Vector3 m_PlayerGravityDirOnSpawn;
     public enum WorldIndexEnum { World1, World2 };
     public WorldIndexEnum m_WorldIndex = 0;
+    public AudioClip m_CheckpointSound;
+    public bool m_PlaySound = true;
+    private bool m_Activated = true;
 
 	// Use this for initialization
 	void Start () {
         m_Cs = GameObject.Find("Player").GetComponent<ControllerScript>();
 	}
 	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 
     /**
      *  OnTriggerEnter(Collider col)
@@ -43,7 +42,12 @@ public class CheckpointScript : MonoBehaviour {
     {
         if (col.CompareTag("Player"))
         {
-			setRespawnIntel();
+            if (m_Activated)
+            {
+                if (m_PlaySound)
+                    audio.PlayOneShot(m_CheckpointSound);
+                setRespawnIntel();
+            }
         }
     }
 	
@@ -58,7 +62,8 @@ public class CheckpointScript : MonoBehaviour {
         }
         SaveSerializedData();
         m_Cs.AddDataToLoad(m_GameObjects);*/
-        gameObject.SetActive(false);
+        //gameObject.SetActive(false);
+        m_Activated = false;
 	}
 	
     void SaveSerializedData()

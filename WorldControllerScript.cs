@@ -68,7 +68,7 @@ public class WorldControllerScript : MonoBehaviour
 			{
 	            if (go.GetComponent<Renderer>() != null)
 	            {
-	                Color c = go.renderer.material.color;
+                    Color c = go.renderer.material.HasProperty("_Color") ? go.renderer.material.color : Color.black;
 	                c.a = m_CurrentWorld == 0 && go.layer == 8 || m_CurrentWorld != 0 && go.layer == 9 ? 1.0f : 0.3f;
 	                go.renderer.material.color = c;
 	            }

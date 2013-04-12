@@ -13,7 +13,7 @@ using System.Collections;
 
 public class LaserBeamColliderScript : MonoBehaviour {
 
-
+    public AudioClip m_LaserSound;
     private ControllerScript m_PlayerControler;
 
         // Use this for initialization
@@ -29,6 +29,9 @@ public class LaserBeamColliderScript : MonoBehaviour {
     void OnTriggerEnter(Collider col)
     {
         if (col.CompareTag("Player"))
+        {
+            audio.PlayOneShot(m_LaserSound);
             m_PlayerControler.RespawnPlayer();
+        }
     }
 }
