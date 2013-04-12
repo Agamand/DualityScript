@@ -81,7 +81,6 @@ public class AutomatedMovingPlatformScript : MonoBehaviour {
     // Update is called once per frame
     void Update()
     {
-		Debug.Log(this.animation["Forward"].time);
         if (m_Inverse)
         {
             if (this.animation["Forward"].time < 0f)

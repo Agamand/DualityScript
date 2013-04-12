@@ -24,24 +24,12 @@ public class AttachableObjectScript : MonoBehaviour {
 	
     // Use this for initialization
 	void Start () {
-        m_OriginalTransform = gameObject.transform.parent;
-        if (gameObject.transform.GetComponent<LocalGravityScript>())
-            m_OriginalGravity = gameObject.transform.GetComponent<LocalGravityScript>().GetGravity();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
-
-    /**
-     *  SetOriginalGravity(Vector3 gravity)
-     *      --> Sets the original gravity
-     * */
-    public void SetOriginalGravity(Vector3 grav)
-    {
-        this.m_OriginalGravity = grav;
-    }
 
 
     /**
@@ -54,15 +42,6 @@ public class AttachableObjectScript : MonoBehaviour {
     }
 
     /**
-     * GetOriginalGravity()
-     *  --> returns the original gravity of the gameObject
-     * */
-    public Vector3 GetOriginalGravity()
-    {
-        return m_OriginalGravity;
-    }
-
-    /**
      * SetGrabber(GameObject grabber)
      *  --> Defines the grabber actually carrying the object
      *  
@@ -72,17 +51,5 @@ public class AttachableObjectScript : MonoBehaviour {
     public void SetGrabber(GameObject grabber)
     {
         m_Grabber = grabber;
-    }
-
-    void OnCollisionEnter(Collision col)
-    {
-        if (m_Grabber != null)
-        {
-
-            if (!col.gameObject.CompareTag("Dynamic") && !col.gameObject.CompareTag("Ball") /*&& !col.gameObject.CompareTag("Player")*/)
-            {
-                m_Grabber.GetComponent<AttachToPlayerScript>().Release();
-            }
-        }
     }
 }

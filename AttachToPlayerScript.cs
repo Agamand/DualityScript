@@ -18,27 +18,19 @@ using System.Collections;
 public class AttachToPlayerScript : MonoBehaviour
 {
     private bool m_IsGrabbing = false;
-    //private ArrayList m_Colliders;
     private Collider m_Grabbed;
     private WorldControllerScript m_WorldController;
 
     // Use this for initialization
     void Start()
     {
-        //m_Colliders = new ArrayList();
         m_WorldController = GameObject.Find("GameWorld").GetComponent<WorldControllerScript>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (m_IsGrabbing)
-        {
-            m_Grabbed.transform.position = gameObject.transform.position;
-            m_Grabbed.transform.rotation = gameObject.transform.rotation;
-        }
     }
-
     /**
      * OnTriggerEnter(Collider col)
      *  --> called when a collider enter in collision with the grabber
@@ -68,10 +60,10 @@ public class AttachToPlayerScript : MonoBehaviour
         if (col.gameObject.transform.GetComponent<AttachableObjectScript>() != null && col.gameObject.transform.GetComponent<LocalGravityScript>() != null
             && col.gameObject.transform.GetComponent<AttachableObjectScript>().m_IsGrabbable)
         {
-            if (col == m_Grabbed)
+            if (col == m_Grabbed && !m_IsGrabbing)
                 m_Grabbed = null;
         }
-    }
+     }
 
     /**
      *  Grab()
@@ -79,11 +71,17 @@ public class AttachToPlayerScript : MonoBehaviour
      * */
     public void Grab()
     {
-        if (m_Grabbed)
+     	Debug.Log("Grabing !");
+		Debug.Log(m_Grabbed);
+		if (m_Grabbed)
         {
-            m_Grabbed.transform.GetComponent<AttachableObjectScript>().SetOriginalGravity(m_Grabbed.transform.GetComponent<LocalGravityScript>().GetStartDir());
-            m_Grabbed.transform.GetComponent<LocalGravityScript>().setGravityDir(new Vector3(0, 0, 0));
-            m_Grabbed.gameObject.transform.parent = gameObject.transform;
+			Debug.Log(m_Grabbed);
+            //m_Grabbed.transform.GetComponent<AttachableObjectScript>().SetOriginalGravity(m_Grabbed.transform.GetComponent<LocalGravityScript>().GetStartDir());
+            //m_Grabbed.transform.GetComponent<LocalGravityScript>().setGravityDir(new Vector3(0, 0, 0));
+            //m_Grabbed.gameObject.transform.parent = gameObject.transform;
+			
+			m_Grabbed.gameObject.transform.position = transform.position;
+			this.GetComponent<FixedJoint>().connectedBody = m_Grabbed.rigidbody;
 
             Color c = m_Grabbed.gameObject.renderer.material.color;
             c.a = 0.3f;
@@ -97,15 +95,15 @@ public class AttachToPlayerScript : MonoBehaviour
     /**
      *  Release()
      *      --> Called when the player presses 'E' and is currently holding an object, allow him to release it
-     *      --> Called when the carried object enter in collision with a static object
      * */
     public void Release()
     {
+		Debug.Log("Release Grabing !");
         if (m_IsGrabbing == true)
         {
-            m_Grabbed.gameObject.transform.parent = m_Grabbed.gameObject.transform.GetComponent<AttachableObjectScript>().GetOriginalTransform();
             m_IsGrabbing = false;
-
+			
+			Debug.Log(m_Grabbed);
             Color c = m_Grabbed.gameObject.renderer.material.color;
             if (m_Grabbed.gameObject.layer == 8 || m_Grabbed.gameObject.layer == 9)
                 c.a = m_WorldController.GetCurrentWorld().layer == m_Grabbed.gameObject.layer ? 1.0f : 0.3f;
@@ -114,8 +112,8 @@ public class AttachToPlayerScript : MonoBehaviour
 
             m_Grabbed.gameObject.renderer.material.color = c;
             m_Grabbed.gameObject.GetComponent<AttachableObjectScript>().SetGrabber(null);
-            m_Grabbed.transform.GetComponent<LocalGravityScript>().setGravityDir(m_Grabbed.transform.GetComponent<AttachableObjectScript>().GetOriginalGravity());
-            m_Grabbed.gameObject.rigidbody.velocity = new Vector3(0, 0, 0);
+			this.GetComponent<FixedJoint>().connectedBody = null;
+			m_Grabbed = null;
         }
     }
 
