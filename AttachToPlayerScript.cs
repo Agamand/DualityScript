@@ -71,8 +71,6 @@ public class AttachToPlayerScript : MonoBehaviour
      * */
     public void Grab()
     {
-     	Debug.Log("Grabing !");
-		Debug.Log(m_Grabbed);
 		if (m_Grabbed)
         {
 			Debug.Log(m_Grabbed);
