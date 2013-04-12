@@ -224,12 +224,6 @@ public class ControllerScript : MonoBehaviour {
             m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber()); 
 		}
 
-        if (Input.GetButtonDown("Crouch"))
-        {
-            Debug.Log("Crouching : " + gameObject); 
-            gameObject.transform.localScale += new Vector3(0, -0.4f, 0);
-        }
-
 		vforce = Vector3.Normalize(vforce) * force * m_Baseforce * dTime;
 		
 		if(!IsOnGround())

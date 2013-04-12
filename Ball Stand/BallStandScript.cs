@@ -17,7 +17,8 @@ public class BallStandScript : MonoBehaviour {
     private bool m_IsOn = false;
     public DoorWithSwitchScript m_AssociatedDoor;
     private Light[] m_Lights;
-
+	public AudioClip m_SwitchOnSound; 
+	public AudioClip m_SwitchOffSound;
 
 	// Use this for initialization
 	void Start () {
@@ -41,6 +42,7 @@ public class BallStandScript : MonoBehaviour {
      * */
     public void FlickOn()
     {
+		audio.PlayOneShot(m_SwitchOnSound);
         m_IsOn = true;
         foreach (Light l in m_Lights)
                 l.color = Color.green;
@@ -53,6 +55,7 @@ public class BallStandScript : MonoBehaviour {
      * */
     public void  FlickOff()
     {
+		audio.PlayOneShot(m_SwitchOffSound);
         m_IsOn = false;
         foreach (Light l in m_Lights)
             l.color = Color.red;

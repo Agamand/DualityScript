@@ -2,7 +2,10 @@ fileFormatVersion: 2
 guid: d7dffc8e62db55940998cc33cb4a1087
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - m_JumpingSound: {fileID: 8300000, guid: 62ef4a3ebe5bc9c43964cadacb444c34, type: 3}
+  - m_SwitchWorldSound: {fileID: 8300000, guid: e025b518648d2594b90ad1a330bb243b,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
