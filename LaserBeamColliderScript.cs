@@ -28,6 +28,7 @@ public class LaserBeamColliderScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider col)
     {
-        m_PlayerControler.RespawnPlayer();
+        if (col.CompareTag("Player"))
+            m_PlayerControler.RespawnPlayer();
     }
 }

@@ -37,7 +37,7 @@ public class DoorWithSwitchScript : MonoBehaviour {
     public Material m_ClosedMaterial;
     public float m_Height = 3.5f;
     private Vector3 m_RelPosition;
-    private bool m_IsChangingState = true;
+    private bool m_IsChangingState = false;
 
 	void Start () {
         m_Door = gameObject.transform.FindChild("DoorPane").gameObject;
@@ -58,13 +58,14 @@ public class DoorWithSwitchScript : MonoBehaviour {
 
     // Called  both when a switches changes its state and while the door is closing or opening
 	public void CheckSwitchesState () {
+        print("Cheking state of " + m_Switches.Length + " switches");
         if (m_Switches != null)
         {
             m_IsCleared = true;
 
-            for (int i = 0; i < m_Switches.Length; i++)
+            foreach (BallStandScript m_Switch in m_Switches)
             {
-                if (!m_Switches[i].GetState())
+                if (!m_Switch.GetState())
                     m_IsCleared = false;
             }
             if (m_IsCleared)
