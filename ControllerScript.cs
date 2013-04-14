@@ -48,6 +48,12 @@ public class ControllerScript : MonoBehaviour {
     private Quaternion m_RespawnRotation;
     private Vector3 m_InitialVelocity;
     private ArrayList m_goToLoad;
+    private Collider m_PlayerCollider;
+    private bool m_GoForward;
+    private bool m_GoBackward;
+    private bool m_GoLeft;
+    private bool m_GoRight;
+    private bool m_GoJump;
 
 	
     JumperScript m_JumpHandler = null;
@@ -56,6 +62,7 @@ public class ControllerScript : MonoBehaviour {
 	LocalGravityScript m_LocalGravityScript = null;
 	public AudioClip m_JumpingSound;
 	public AudioClip m_SwitchWorldSound;
+ 
 
 
     /*Animation for changeGravity*/
@@ -85,6 +92,7 @@ public class ControllerScript : MonoBehaviour {
         ToggleFlashLight();
         Screen.lockCursor = true;
         m_goToLoad = new ArrayList();
+        m_PlayerCollider = gameObject.collider;
     }
 	
     /**
@@ -180,24 +188,27 @@ public class ControllerScript : MonoBehaviour {
 
 		UpdateMouse();
 		transform.Rotate(Vector3.up,m_Rot_Y);
-		Vector3 vforce = new Vector3(0.0f,0.0f,0.0f);
-		float dTime = Time.deltaTime;
 		
-		float force = m_Speed;
-
         if (Input.GetButton("Go Forward"))
-            vforce += Vector3.forward;
+            m_GoForward = true;
+        else
+            m_GoForward = false;
 
         if (Input.GetButton("Go Backward"))
-		{
-            vforce += Vector3.back;
-			force = m_BackSpeed;	
-		}
+                m_GoBackward = true;
+            else
+                m_GoBackward = false;
+
         if (Input.GetButton("Strafe Right"))
-            vforce += Vector3.right;
+                m_GoRight = true;
+            else
+                m_GoRight = false;
+
 
         if (Input.GetButton("Strafe Left"))
-            vforce += Vector3.left;
+                m_GoLeft = true;
+            else
+                m_GoLeft = false;
 
         if (Input.GetButtonDown("Respawn"))
         {
@@ -224,23 +235,57 @@ public class ControllerScript : MonoBehaviour {
             m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber()); 
 		}
 
-		vforce = Vector3.Normalize(vforce) * force * m_Baseforce * dTime;
-		
-		if(!IsOnGround())
-			vforce = vforce*0.5f;
-		
         if(Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
-		{
-			audio.PlayOneShot(m_JumpingSound);
-            vforce += Vector3.up * m_Jump;
-            m_JumpHandler.OnJump();
-		}
-		
-		vforce = transform.rotation*vforce;
-		rigidbody.AddForce(vforce);
+            m_GoJump = true;
+        else
+            m_GoJump = false;
+
         UpdateAnimation();
 	}
- 
+
+    void FixedUpdate()
+    {
+        float dTime = Time.deltaTime;
+        float force = m_Speed;
+        Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
+
+        if (m_GoForward)
+        {
+           vforce += Vector3.forward;
+        }
+        if (m_GoBackward)
+        {
+            vforce += Vector3.back;
+            force = m_BackSpeed;	
+
+        }
+        if (m_GoRight)
+        {
+            vforce += Vector3.right;
+
+        }
+        if (m_GoLeft)
+        {
+            vforce += Vector3.left;
+        }
+
+        vforce = Vector3.Normalize(vforce) * force * m_Baseforce * dTime;
+
+        if (!IsOnGround())
+            vforce = vforce * 0.5f;
+
+        if (m_GoJump)
+        {
+            audio.PlayOneShot(m_JumpingSound);
+            vforce += Vector3.up * m_Jump;
+            m_JumpHandler.OnJump();
+        }
+
+
+        vforce = transform.rotation * vforce;
+        rigidbody.AddForce(vforce);
+
+    }
 
     /**
      *  RespawnPlayer(): 
@@ -268,6 +313,15 @@ public class ControllerScript : MonoBehaviour {
         } 
 
     }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (m_AttachToPlayer.IsGrabbing() && (col.name.Equals("Grabber") || col == m_AttachToPlayer.GetGrabbed()))
+        {
+            m_AttachToPlayer.Release();
+        }
+    }
+
 
     /**
      *  SetRespawnPosition(Vector3 new_Position)
@@ -320,5 +374,30 @@ public class ControllerScript : MonoBehaviour {
         transform.rotation = Quaternion.Lerp(m_Oldquaternion, m_Newquaternion * m_Oldquaternion, (m_AnimationTime - m_AnimationTimer) / m_AnimationTime);
         if (m_AnimationTimer == 0.0f)
             m_IsInAnimation = false;
+    }
+
+    public bool CheckIfInsideObject(int layer)
+    {
+        Vector3 p1 = transform.position + Vector3.up * -0.5f;
+        Vector3 p2 = p1 + Vector3.up * 1;
+        Collider[] hitColliders = Physics.OverlapSphere(p1, 0.49f);
+        foreach (Collider col in hitColliders)
+            if (col.gameObject.layer == layer)
+            {
+                print("Top end is inside " + col.name);
+                RespawnPlayer();
+                return false;
+            }
+
+        Collider[] hitColliders2 = Physics.OverlapSphere(p2, 0.49f);
+        foreach (Collider col in hitColliders2)
+            if (col.gameObject.layer == layer)
+            {
+                print("Low end is inside " + col.name);
+                RespawnPlayer();
+                return false;
+            }
+
+        return true;
     }
 }

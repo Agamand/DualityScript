@@ -15,11 +15,10 @@ public class MainMenu : MonoBehaviour {
     private float m_fov = 90.0f;
     private float m_music_volume = 10.0f;
     private float m_sound_effects_volume = 10.0f;
-    private float m_voice_volume = 10.0f;
     private bool m_fullscreen = false;
     private bool m_score_show = true;
     private bool m_display_crosshair = true;
-    private bool m_display_subtitles = true;
+    private bool m_display_hints = true;
 
 
 
@@ -32,16 +31,26 @@ public class MainMenu : MonoBehaviour {
                                                "Go Backward", 
                                                "Strafe Left", 
                                                "Strafe Right", 
-                                               "Main Fire", 
-                                               "Alternate Fire", 
                                                "Jump", 
-                                               "Crouch", 
                                                "Switch World", 
                                                "Flashlight", 
                                                "Carry Object", 
                                                "Respawn"
                                           };
-    private static String[] m_keybindings;
+
+    private static String[] m_keybindings_default = {
+                                               "Z", 
+                                               "S", 
+                                               "Q", 
+                                               "D", 
+                                               "Space", 
+                                               "A", 
+                                               "F", 
+                                               "E", 
+                                               "R"
+                                          };
+
+    private String[] m_keybindings;
 
     private String username = "";
     private String password = "";
@@ -89,6 +98,8 @@ public class MainMenu : MonoBehaviour {
     {
         ratio_combobox = new GUIContent[3];
         m_keybindings = new String[m_keybindings_labels.Length];
+        for (int i = 0; i < m_keybindings.Length; i++)
+            m_keybindings[i] = m_keybindings_default[i];
         _4_3_combobox = new GUIContent[resolution_4_3.Length];
         _16_10_combobox = new GUIContent[resolution_16_10.Length];
         _16_9_combobox = new GUIContent[resolution_16_9.Length];
@@ -279,6 +290,10 @@ public class MainMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(200, 210, 100, 40)), "Crosshair :", skin.label);
             m_display_crosshair = GUI.Toggle(ResizeGUI(new Rect(290, 210, 100, 40)), m_display_crosshair, m_display_crosshair ? "  Show" : "  Hide", skin.toggle);
 
+            GUI.Label(ResizeGUI(new Rect(200, 260, 100, 40)), "Hints and tutorials :", skin.label);
+            m_display_hints = GUI.Toggle(ResizeGUI(new Rect(290, 260, 100, 40)), m_display_hints, m_display_hints == true ? "  Show" : "  Hide", skin.toggle);
+
+
             GUI.EndGroup();
 		}
         
@@ -292,11 +307,6 @@ public class MainMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(50, 130, 300, 40)), "Sound Effects Volume", skin.label);
             m_sound_effects_volume = GUI.HorizontalSlider(ResizeGUI(new Rect(50, 170, 200, 20)), m_sound_effects_volume, 0, 10.0f, skin.horizontalSlider, skin.horizontalSliderThumb);
             GUI.Label(ResizeGUI(new Rect(260, 160, 60, 40)), Math.Round(m_sound_effects_volume * 10, 0).ToString() + "%", skin.label);
-            GUI.Label(ResizeGUI(new Rect(50, 210, 300, 40)), "Voice Volume", skin.label);
-            m_voice_volume = GUI.HorizontalSlider(ResizeGUI(new Rect(50, 250, 200, 20)), m_voice_volume, 0, 10.0f, skin.horizontalSlider, skin.horizontalSliderThumb);
-            GUI.Label(ResizeGUI(new Rect(260, 240, 60, 40)), Math.Round(m_voice_volume * 10, 0).ToString() + "%", skin.label);
-            GUI.Label(ResizeGUI(new Rect(50, 280, 70, 40)), "Subtitles :", skin.label);
-            m_display_subtitles = GUI.Toggle(ResizeGUI(new Rect(120, 280, 80, 20)), m_display_subtitles, m_display_subtitles == true ? "  Show" : "  Hide", skin.toggle);
 
 
             GUI.EndGroup();
@@ -312,15 +322,26 @@ public class MainMenu : MonoBehaviour {
             for (int i = 0; i < m_keybindings_labels.Length; i++)
             {
                 GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), m_keybindings_labels[i] + " :", skin.label);
-                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), "", skin.textField);
+                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings[i], skin.textField);
             }
-
 
             GUI.EndScrollView();
             //End Key Bindings
 
             GUI.Button(ResizeGUI(new Rect(420, 290, 60, 20)), "Apply", skin.button);
             GUI.Button(ResizeGUI(new Rect(350, 290, 60, 20)), "Default", skin.button);
+
+            /*
+            if (GUI.Button(ResizeGUI(new Rect(350, 290, 60, 20)), "Default", skin.button))
+            {
+                print("Revert to default values");
+                for (int i = 0; i < m_keybindings.Length; i++)
+                {
+                    m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings_default[i], skin.textField);
+                    m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings[i], skin.textField);
+                }
+            }*/
+
 
             GUI.Label(ResizeGUI(new Rect(20, 290, 150, 40)), "Mouse Sensitivity", skin.label);
             m_mouse_sensitivity = GUI.HorizontalSlider(ResizeGUI(new Rect(20, 315, 150, 10)), m_mouse_sensitivity, 0.1f, 10.0f, skin.horizontalSlider, skin.horizontalSliderThumb);

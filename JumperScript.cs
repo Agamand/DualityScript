@@ -108,13 +108,13 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider other)
     {
-		if(other.GetComponent<CheckpointScript>() != null)
-			return; //Ignore Checkpoint !
-        audio.PlayOneShot(m_HittingObjectSound);
+        if (other.CompareTag("Checkpoint") || other.CompareTag("Hint"))
+            return;//Ignore Checkpoint !
 
-		
+
         if (m_CollideCount == 0)
         {
+            audio.PlayOneShot(m_HittingObjectSound);
             Cooldown();
             m_JumpCharge = m_MaxJumpCharge;
         }
@@ -132,7 +132,7 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerExit(Collider  other)
     {
-		if(other.GetComponent<CheckpointScript>() != null)
+        if (other.CompareTag("Checkpoint") || other.CompareTag("Hint"))
 			return; //Ignore Checkpoint !
 		
         m_CollideCount--;

@@ -24,11 +24,13 @@ public class WorldControllerScript : MonoBehaviour
     private GameObject m_World2;
     private ScreenEffectScript m_ScreenEffet;
     public LaserBeamScript m_LaserBeamScript;
+    private ControllerScript m_PlayerCS;
 
     void Start()
     {
         m_World1 = GameObject.Find("World1");
         m_World2 = GameObject.Find("World2");
+        m_PlayerCS = GameObject.FindGameObjectWithTag("Player").GetComponent<ControllerScript>();
         m_ScreenEffet = GameObject.Find("ScreenEffectGlobalScript").GetComponent<ScreenEffectScript>();
         Physics.IgnoreLayerCollision(8, 9);
         SetWorld(0);
@@ -40,6 +42,7 @@ public class WorldControllerScript : MonoBehaviour
      * */
     public void SwitchWorld()
     {
+        m_PlayerCS.CheckIfInsideObject(m_CurrentWorld == 0 ? 9 : 8);
         SetWorld(m_CurrentWorld == 0 ? 1 : 0);
         if (m_LaserBeamScript != null)
             m_LaserBeamScript.SwitchState();

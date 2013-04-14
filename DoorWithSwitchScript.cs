@@ -47,31 +47,29 @@ public class DoorWithSwitchScript : MonoBehaviour {
             new Vector3(0, 0, m_Speed)
         };
         m_RelPosition.Set(0, 0, 0);
+        if (m_Switches.Length == 0)
+            OpenDoor();
 	}
 	
 	// Update is called once per frame
     void Update()
     {
-        if (m_Switches != null && m_IsChangingState)
+        if (m_IsChangingState)
             CheckSwitchesState();
     }
 
     // Called  both when a switches changes its state and while the door is closing or opening
 	public void CheckSwitchesState () {
-        if (m_Switches != null)
+        m_IsCleared = true;
+        for (int i = 0; i < m_Switches.Length; i++)
         {
-            m_IsCleared = true;
-
-            for (int i = 0; i < m_Switches.Length; i++)
-            {
-                if (!m_Switches[i].GetState())
-                    m_IsCleared = false;
-            }
-            if (m_IsCleared)
-                OpenDoor();
-            else
-                CloseDoor();
+            if (!m_Switches[i].GetState())
+                m_IsCleared = false;
         }
+        if (m_IsCleared)
+            OpenDoor();
+        else
+            CloseDoor();
     }
 
     /*

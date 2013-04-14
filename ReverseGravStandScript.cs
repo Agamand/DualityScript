@@ -15,12 +15,14 @@ using System.Collections;
 public class ReverseGravStandScript : MonoBehaviour {
 
     public Vector3 m_Gravity = new Vector3();
+    public AudioClip m_Sound;
 
     void OnTriggerEnter(Collider other)
     {
         LocalGravityScript gravityScript = other.GetComponent<LocalGravityScript>();
         if (gravityScript == null)
             return;
+        audio.PlayOneShot(m_Sound);
         gravityScript.setGravityDir(m_Gravity);
     }
 }
