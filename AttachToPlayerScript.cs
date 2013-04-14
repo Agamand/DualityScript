@@ -79,7 +79,7 @@ public class AttachToPlayerScript : MonoBehaviour
             //m_Grabbed.gameObject.transform.parent = gameObject.transform;
 			
 			m_Grabbed.gameObject.transform.position = transform.position;
-			this.GetComponent<FixedJoint>().connectedBody = m_Grabbed.rigidbody;
+			this.GetComponent<SpringJoint>().connectedBody = m_Grabbed.rigidbody;
 
             Color c = m_Grabbed.gameObject.renderer.material.color;
             c.a = 0.3f;
@@ -96,7 +96,6 @@ public class AttachToPlayerScript : MonoBehaviour
      * */
     public void Release()
     {
-		Debug.Log("Release Grabing !");
         if (m_IsGrabbing == true)
         {
             m_IsGrabbing = false;
@@ -110,7 +109,7 @@ public class AttachToPlayerScript : MonoBehaviour
 
             m_Grabbed.gameObject.renderer.material.color = c;
             m_Grabbed.gameObject.GetComponent<AttachableObjectScript>().SetGrabber(null);
-			this.GetComponent<FixedJoint>().connectedBody = null;
+			this.GetComponent<SpringJoint>().connectedBody = null;
 			m_Grabbed = null;
         }
     }

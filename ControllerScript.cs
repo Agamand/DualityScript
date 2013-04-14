@@ -293,7 +293,8 @@ public class ControllerScript : MonoBehaviour {
      * */
     public void RespawnPlayer()
     {
-        transform.position = m_RespawnPosition;
+		SaveManager.LoadLastSave();
+        /*transform.position = m_RespawnPosition;
         //transform.rotation = m_RespawnRotation;
         transform.rigidbody.velocity = m_InitialVelocity;
 		m_LocalGravityScript.setGravityDir(m_RespawnGravityDir);
@@ -310,7 +311,7 @@ public class ControllerScript : MonoBehaviour {
                                             PlayerPrefs.GetFloat(go.name + ".transform.position.z")
                                           );            
             }
-        } 
+        }*/
 
     }
 
@@ -332,7 +333,8 @@ public class ControllerScript : MonoBehaviour {
      * */
     public void SetRespawnPosition(Vector3 newPosition)
     {
-        m_RespawnPosition = newPosition;
+        SaveManager.SaveLastSave();
+		//m_RespawnPosition = newPosition;
     }
 
     /**
