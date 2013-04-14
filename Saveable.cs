@@ -6,6 +6,7 @@ public class Saveable : MonoBehaviour {
 
 	public bool m_SaveTransform;
 	public bool m_SavePhysics;
+	public bool m_SaveGravity;
 		
 	public Save SaveTo()
 	{
@@ -15,6 +16,12 @@ public class Saveable : MonoBehaviour {
 			_save.m_Transform = new TransformSerializable(transform);
 		if(m_SavePhysics)
 			_save.m_RigidBody = new RigidBodySerializable(rigidbody);
+		if(m_SaveGravity)
+		{
+			LocalGravityScript script = null;
+			if((script = GetComponent<LocalGravityScript>()) != null)
+				_save.m_Gravity = new Vector3Serializable(script.GetStartDir());
+		}
 		return _save;
 	}
 	
@@ -25,5 +32,12 @@ public class Saveable : MonoBehaviour {
 		
 		if(m_SaveTransform)
 			save.m_Transform.CopyTo(transform);
+		
+		if(m_SaveGravity)
+		{
+			LocalGravityScript script = null;
+			if((script = GetComponent<LocalGravityScript>()) != null)
+				script.setGravityDir(save.m_Gravity.ToVector3());
+		}
 	}
 }

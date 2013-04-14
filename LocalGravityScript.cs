@@ -55,11 +55,8 @@ public class LocalGravityScript : MonoBehaviour {
         float mass = m_Body ? m_Body.mass : 1.0f;
 
         Vector3 old = Vector3.Normalize(m_Gravity);
-      //  Debug.Log("newGravity = " + newGravity.ToString());
         m_Gravity = newGravity;
-     //   Debug.Log("Gravity = " + m_Gravity.ToString());
         m_Gravity *= m_gravityAcceleration;
-      //  Debug.Log("Gravity = " + m_Gravity.ToString());
         m_ConstForce.force = m_Gravity * mass;
 
         Debug.Log("Change Gravity Dir, from " + old.ToString() + " to " + newGravity.ToString());

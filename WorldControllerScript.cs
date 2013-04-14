@@ -42,10 +42,9 @@ public class WorldControllerScript : MonoBehaviour
      * */
     public void SwitchWorld()
     {
-        m_PlayerCS.CheckIfInsideObject(m_CurrentWorld == 0 ? 9 : 8);
+        
         SetWorld(m_CurrentWorld == 0 ? 1 : 0);
-        if (m_LaserBeamScript != null)
-            m_LaserBeamScript.SwitchState();
+
     }
 
     /**
@@ -57,6 +56,11 @@ public class WorldControllerScript : MonoBehaviour
      * */
     public void SetWorld(int world)
     {
+		m_PlayerCS.CheckIfInsideObject(m_CurrentWorld == 0 ? 9 : 8);
+		
+		if (m_LaserBeamScript != null && m_CurrentWorld != world)
+            m_LaserBeamScript.SwitchState();
+		
         m_CurrentWorld = world;
 
         Physics.IgnoreLayerCollision(10, 8, m_CurrentWorld != 0);
@@ -64,7 +68,7 @@ public class WorldControllerScript : MonoBehaviour
         //Debug.Log("current_world : " + m_CurrentWorld);
 		GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
 		
-		
+
 		foreach(GameObject go in gos)
 		{
 			if(go.layer == 8 || go.layer == 9) 

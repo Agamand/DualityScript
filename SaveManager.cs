@@ -148,6 +148,7 @@ public class Save
 	public int m_Id;
 	public TransformSerializable m_Transform = new TransformSerializable();
 	public RigidBodySerializable m_RigidBody = new RigidBodySerializable();
+	public Vector3Serializable m_Gravity = new Vector3Serializable();
 	public Save(int id)
 	{
 		m_Id = id;
@@ -159,6 +160,7 @@ public class Save
 public class GameSave
 {
 	public int level;
+	public int world;
 	private Dictionary<int,Save> m_SaveMaps;
 	public GameSave()
 	{
@@ -239,12 +241,30 @@ public static class SaveManager
 			Debug.Log("Load object : " + save.m_Id);
 			savecomponent.Load(save);
 		}
+		WorldControllerScript worldController = null;
+		GameObject worldControllerGo = GameObject.Find("GameWorld");
+		if(worldControllerGo != null)
+		{
+			if((worldController = worldControllerGo.GetComponent<WorldControllerScript>()) != null)
+				worldController.SetWorld(gamesave.world);
+		}
+		
 	}
 	
 	public static void SaveLastSave()
 	{
 		Debug.Log("SAVE");
 		GameSave gamesave = new GameSave();
+		
+		WorldControllerScript worldController = null;
+		GameObject worldControllerGo = GameObject.Find("GameWorld");
+		if(worldControllerGo != null)
+		{
+			if((worldController = worldControllerGo.GetComponent<WorldControllerScript>()) != null)
+				gamesave.world = worldController.GetCurrentWorldNumber();
+		}
+		
+		
 		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
 		foreach(GameObject go in gameObject)
 		{
