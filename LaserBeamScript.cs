@@ -20,7 +20,6 @@ public class LaserBeamScript : MonoBehaviour {
     private GameObject []m_LaserBeams;
     private LineRenderer []m_LineRenderers;
     private GameObject m_CurrentWorld;
-    private WorldControllerScript m_worldController;
 
 	// Use this for initialization
 	void Start () {
@@ -28,44 +27,24 @@ public class LaserBeamScript : MonoBehaviour {
         m_LineRenderers = new LineRenderer[m_LaserBeams.Length];
         for (int i = 0; i < m_LaserBeams.Length; i++)
             m_LineRenderers[i] = m_LaserBeams[i].GetComponent<LineRenderer>();
-        m_worldController = GameObject.Find("GameWorld").GetComponent<WorldControllerScript>();
-        m_CurrentWorld = m_worldController.GetCurrentWorld();
-        InitializeLasers();
 	}
 	
 	/*
      * Called when the player switches world
      * */
-	public void SwitchState () {
-            m_CurrentWorld = m_worldController.GetCurrentWorld();
-            for (int i = 0; i < m_LaserBeams.Length; i++)
-            {
-                if (m_CurrentWorld.layer == m_LaserBeams[i].layer || m_LaserBeams[i].layer == 0)
-                {
-                    m_LineRenderers[i].renderer.enabled = true;
-                }
-                else if (m_CurrentWorld.layer != m_LaserBeams[i].layer)
-                {
-                    m_LineRenderers[i].renderer.enabled = false;
-                }
-
-            }          
-	}
-
-    public void InitializeLasers()
-    {
+	public void SetState (int currentWorldLayer) {
         for (int i = 0; i < m_LaserBeams.Length; i++)
         {
-            if (8 == m_LaserBeams[i].layer || m_LaserBeams[i].layer == 0)
+            if (currentWorldLayer == m_LaserBeams[i].layer || m_LaserBeams[i].layer == 0)
             {
                 m_LineRenderers[i].renderer.enabled = true;
-
             }
-            else if (8 != m_LaserBeams[i].layer)
+            else if (currentWorldLayer != m_LaserBeams[i].layer)
             {
                 m_LineRenderers[i].renderer.enabled = false;
             }
 
         }          
-    }
+	}
+
 }
