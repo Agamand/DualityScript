@@ -25,6 +25,7 @@ public class WorldControllerScript : MonoBehaviour
     private ScreenEffectScript m_ScreenEffet;
     public LaserBeamScript m_LaserBeamScript;
     private ControllerScript m_PlayerCS;
+	private JumperScript m_PlayerJumper;
 
     void Start()
     {
@@ -32,6 +33,7 @@ public class WorldControllerScript : MonoBehaviour
         m_World2 = GameObject.Find("World2");
         m_PlayerCS = GameObject.FindGameObjectWithTag("Player").GetComponent<ControllerScript>();
         m_ScreenEffet = GameObject.Find("ScreenEffectGlobalScript").GetComponent<ScreenEffectScript>();
+		m_PlayerJumper = GameObject.FindGameObjectWithTag("Jumper").GetComponent<JumperScript>();
         Physics.IgnoreLayerCollision(8, 9);
         SetWorld(0);
     }
@@ -67,7 +69,7 @@ public class WorldControllerScript : MonoBehaviour
         Physics.IgnoreLayerCollision(10, 9, m_CurrentWorld == 0);
         //Debug.Log("current_world : " + m_CurrentWorld);
 		GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
-		
+		m_PlayerJumper.SetMaxCharge(m_CurrentWorld);
 
 		foreach(GameObject go in gos)
 		{

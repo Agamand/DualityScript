@@ -236,7 +236,7 @@ public class ControllerScript : MonoBehaviour
         {
             audio.PlayOneShot(m_SwitchWorldSound);
             m_WorldHandler.SwitchWorld();
-            m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
+            //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
         }
 
         Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
@@ -320,10 +320,10 @@ public class ControllerScript : MonoBehaviour
 
     void OnTriggerEnter(Collider col)
     {
-        if (m_AttachToPlayer.IsGrabbing() && (col.name.Equals("Grabber") || col == m_AttachToPlayer.GetGrabbed()))
+        /*if (m_AttachToPlayer.IsGrabbing() && (col.name.Equals("Grabber") || col == m_AttachToPlayer.GetGrabbed()))
         {
             m_AttachToPlayer.Release();
-        }
+        }*/
     }
 
 

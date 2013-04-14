@@ -80,6 +80,7 @@ public class QuaternionSerializable
 	
 	public Quaternion ToQuaternion()
 	{
+		Debug.Log("(" + x + ", " + y + ", " + z + ", " + w + ")"); 
 		return new Quaternion(x,y,z,w);
 	}
 	
@@ -104,15 +105,16 @@ public class TransformSerializable
 	
 	public TransformSerializable(Transform t)
 	{
-		position = new Vector3Serializable(t.position);
-		rotation = new QuaternionSerializable(t.rotation);
+		position = new Vector3Serializable(t.localPosition);
+		rotation = new QuaternionSerializable(t.localRotation);
 		scale = new Vector3Serializable(t.localScale);
 	}
 	
 	public void CopyTo(Transform t)
 	{
-		t.position = position.ToVector3();
-		t.rotation = rotation.ToQuaternion();
+		t.localPosition = position.ToVector3();
+		t.localRotation = rotation.ToQuaternion();
+		Debug.Log(t.rotation.ToString());
 		t.localScale = scale.ToVector3();
 		Debug.Log("COPY POS : " + t.position.ToString()); 
 	}
@@ -186,7 +188,7 @@ public class GameSave
 
 public static class SaveManager
 {
-	static MemoryStream last_save = null;
+	static GameSave last_save = null;
 	public static void Load(string path)
 	{
 		Stream s = System.IO.File.Open(path,System.IO.FileMode.Open);
@@ -220,17 +222,17 @@ public static class SaveManager
 		if(last_save == null)
 			return;
 		Debug.Log("LOAD");
-		last_save.Seek(0, SeekOrigin.Begin);
+		/*last_save.Seek(0, SeekOrigin.Begin);
 		BinaryFormatter f = new BinaryFormatter();	
 		f.Binder = new VersionDeserializationBinder();
 		GameSave gamesave;
-		gamesave = (GameSave)f.Deserialize(last_save);
-		if( Application.loadedLevel != gamesave.level)
-			Application.LoadLevel(gamesave.level);
+		gamesave = (GameSave)f.Deserialize(last_save);*/
+		if( Application.loadedLevel != last_save.level)
+			Application.LoadLevel(last_save.level);
 		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
 		foreach(GameObject go in gameObject)
 		{
-			Save save = gamesave.GetSave(go.GetInstanceID());
+			Save save = last_save.GetSave(go.GetInstanceID());
 			if(save == null)
 				continue;
 			
@@ -246,7 +248,7 @@ public static class SaveManager
 		if(worldControllerGo != null)
 		{
 			if((worldController = worldControllerGo.GetComponent<WorldControllerScript>()) != null)
-				worldController.SetWorld(gamesave.world);
+				worldController.SetWorld(last_save.world);
 		}
 		
 	}
@@ -278,11 +280,12 @@ public static class SaveManager
 		}
 		
 		gamesave.level = Application.loadedLevel;
-			
+		last_save = gamesave;	
+		/*
 		last_save = new MemoryStream();
 		BinaryFormatter f = new BinaryFormatter();	
 		f.Binder = new VersionDeserializationBinder(); 
-		f.Serialize(last_save,gamesave);
+		f.Serialize(last_save,gamesave);*/
 	}
 	
 	public static void Save(string path)

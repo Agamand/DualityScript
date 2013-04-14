@@ -20,10 +20,11 @@ public class AttachToPlayerScript : MonoBehaviour
     private bool m_IsGrabbing = false;
     private Collider m_Grabbed;
     private WorldControllerScript m_WorldController;
-
+	private GameObject m_Player;
     // Use this for initialization
     void Start()
     {
+		m_Player = GameObject.Find("Player");
         m_WorldController = GameObject.Find("GameWorld").GetComponent<WorldControllerScript>();
     }
 
@@ -77,7 +78,7 @@ public class AttachToPlayerScript : MonoBehaviour
             //m_Grabbed.transform.GetComponent<AttachableObjectScript>().SetOriginalGravity(m_Grabbed.transform.GetComponent<LocalGravityScript>().GetStartDir());
             //m_Grabbed.transform.GetComponent<LocalGravityScript>().setGravityDir(new Vector3(0, 0, 0));
             //m_Grabbed.gameObject.transform.parent = gameObject.transform;
-			
+			Physics.IgnoreCollision(m_Player.collider,m_Grabbed.collider);
 			m_Grabbed.gameObject.transform.position = transform.position;
 			this.GetComponent<FixedJoint>().connectedBody = m_Grabbed.rigidbody;
 
@@ -106,6 +107,8 @@ public class AttachToPlayerScript : MonoBehaviour
                 c.a = m_WorldController.GetCurrentWorld().layer == m_Grabbed.gameObject.layer ? 1.0f : 0.3f;
             else
                 c.a = 1.0f;
+			
+			Physics.IgnoreCollision(m_Player.collider,m_Grabbed.collider, false);
 
             m_Grabbed.gameObject.renderer.material.color = c;
             m_Grabbed.gameObject.GetComponent<AttachableObjectScript>().SetGrabber(null);
