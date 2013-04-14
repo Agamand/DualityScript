@@ -108,10 +108,8 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider other)
     {
-        print("Now Colliding with : "+other.name);
         if (other.isTrigger)
             return;//Ignore Checkpoint !
-
 
         if (m_CollideCount == 0)
         {
