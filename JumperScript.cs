@@ -108,7 +108,8 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Checkpoint") || other.CompareTag("Hint"))
+        print("Now Colliding with : "+other.name);
+        if (other.isTrigger)
             return;//Ignore Checkpoint !
 
 
@@ -132,7 +133,7 @@ public class JumperScript : MonoBehaviour {
      * */
     void OnTriggerExit(Collider  other)
     {
-        if (other.CompareTag("Checkpoint") || other.CompareTag("Hint"))
+        if (other.isTrigger)
 			return; //Ignore Checkpoint !
 		
         m_CollideCount--;

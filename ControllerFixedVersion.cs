@@ -1,3 +1,5 @@
+/** FIXED UPDATE VERSION
+
 /**
  *  ControllerScript
  *      --> The script used as a Character Controller which handles : 
@@ -32,31 +34,38 @@
 using UnityEngine;
 using System.Collections;
 
-public class ControllerScript : MonoBehaviour {
-	
-	
+public class ControllerFixedVersion : MonoBehaviour
+{
+
+
     public float m_Speed = 1.0f;
-	public float m_BackSpeed = 0.5f;
+    public float m_BackSpeed = 0.5f;
     public float m_Jump = 40000.0f;
-	public float m_MouseSpeed = 100.0f;
+    public float m_MouseSpeed = 100.0f;
     public float m_MaxSpeed = 30.0f;
     public float m_Baseforce = 40000;
     private float m_Incl;
     private float m_Rot_Y;
     private Vector3 m_RespawnPosition;
-	private Vector3 m_RespawnGravityDir;
+    private Vector3 m_RespawnGravityDir;
     private Quaternion m_RespawnRotation;
     private Vector3 m_InitialVelocity;
     private ArrayList m_goToLoad;
     private Collider m_PlayerCollider;
+    private bool m_GoForward;
+    private bool m_GoBackward;
+    private bool m_GoLeft;
+    private bool m_GoRight;
+    private bool m_GoJump;
 
-	
+
     JumperScript m_JumpHandler = null;
-	WorldControllerScript m_WorldHandler = null;
+    WorldControllerScript m_WorldHandler = null;
     AttachToPlayerScript m_AttachToPlayer = null;
-	LocalGravityScript m_LocalGravityScript = null;
-	public AudioClip m_JumpingSound;
-	public AudioClip m_SwitchWorldSound;
+    LocalGravityScript m_LocalGravityScript = null;
+    public AudioClip m_JumpingSound;
+    public AudioClip m_SwitchWorldSound;
+
 
 
     /*Animation for changeGravity*/
@@ -67,20 +76,21 @@ public class ControllerScript : MonoBehaviour {
     private const float m_AnimationTime = 1.0f;
     private bool m_IsInAnimation = false;
     private GameObject m_FlashLight = null;
-	
-	
-	void Start () {
+
+
+    void Start()
+    {
         m_Incl = 0.0f;
         m_Rot_Y = 0.0f;
-		m_JumpHandler = GetComponentInChildren<JumperScript>();
-		GameObject world = GameObject.Find("GameWorld");
-		m_WorldHandler = world.GetComponent<WorldControllerScript>();
+        m_JumpHandler = GetComponentInChildren<JumperScript>();
+        GameObject world = GameObject.Find("GameWorld");
+        m_WorldHandler = world.GetComponent<WorldControllerScript>();
         Screen.showCursor = false;
         m_RespawnPosition = transform.position;
         m_RespawnRotation = transform.rotation;
         m_InitialVelocity.Set(0, 0, 0);
-		m_LocalGravityScript = gameObject.GetComponent<LocalGravityScript>();
-		m_RespawnGravityDir = m_LocalGravityScript.GetStartDir();
+        m_LocalGravityScript = gameObject.GetComponent<LocalGravityScript>();
+        m_RespawnGravityDir = m_LocalGravityScript.GetStartDir();
         m_AttachToPlayer = GameObject.Find("Grabber").GetComponent<AttachToPlayerScript>();
         m_FlashLight = GameObject.Find("Light");
         ToggleFlashLight();
@@ -88,14 +98,14 @@ public class ControllerScript : MonoBehaviour {
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
     }
-	
+
     /**
      * ???????
      **/
-	private float Modulof(float a, float b)
-	{
-		return (a-b*Mathf.Floor(a/b));
-	}
+    private float Modulof(float a, float b)
+    {
+        return (a - b * Mathf.Floor(a / b));
+    }
 
     /**
      * ??????
@@ -145,12 +155,12 @@ public class ControllerScript : MonoBehaviour {
      * -> false : the player is not touching the ground
      * 
      * */
-	private bool IsOnGround()
-	{
-		if(!m_JumpHandler)
-			return true;
-		else return m_JumpHandler.IsOnGround();
-	}
+    private bool IsOnGround()
+    {
+        if (!m_JumpHandler)
+            return true;
+        else return m_JumpHandler.IsOnGround();
+    }
 
 
     /**
@@ -178,28 +188,32 @@ public class ControllerScript : MonoBehaviour {
         m_FlashLight.SetActive(!m_FlashLight.activeInHierarchy);
     }
 
-	void Update () {
+    void Update()
+    {
 
-		UpdateMouse();
-		transform.Rotate(Vector3.up,m_Rot_Y);
-		Vector3 vforce = new Vector3(0.0f,0.0f,0.0f);
-		float dTime = Time.deltaTime;
-		
-		float force = m_Speed;
+        UpdateMouse();
+        transform.Rotate(Vector3.up, m_Rot_Y);
 
         if (Input.GetButton("Go Forward"))
-            vforce += Vector3.forward;
+            m_GoForward = true;
+        else
+            m_GoForward = false;
 
         if (Input.GetButton("Go Backward"))
-		{
-            vforce += Vector3.back;
-			force = m_BackSpeed;	
-		}
+            m_GoBackward = true;
+        else
+            m_GoBackward = false;
+
         if (Input.GetButton("Strafe Right"))
-            vforce += Vector3.right;
+            m_GoRight = true;
+        else
+            m_GoRight = false;
+
 
         if (Input.GetButton("Strafe Left"))
-            vforce += Vector3.left;
+            m_GoLeft = true;
+        else
+            m_GoLeft = false;
 
         if (Input.GetButtonDown("Respawn"))
         {
@@ -220,29 +234,63 @@ public class ControllerScript : MonoBehaviour {
         }
 
         if (Input.GetButtonDown("Switch World"))
-		{
-			audio.PlayOneShot(m_SwitchWorldSound);
-			m_WorldHandler.SwitchWorld();
-            m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber()); 
-		}
+        {
+            audio.PlayOneShot(m_SwitchWorldSound);
+            m_WorldHandler.SwitchWorld();
+            m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
+        }
 
-		vforce = Vector3.Normalize(vforce) * force * m_Baseforce * dTime;
-		
-		if(!IsOnGround())
-			vforce = vforce*0.5f;
-		
-        if(Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
-		{
-			audio.PlayOneShot(m_JumpingSound);
+        if (Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
+            m_GoJump = true;
+        else
+            m_GoJump = false;
+
+        UpdateAnimation();
+    }
+
+    void FixedUpdate()
+    {
+        float dTime = Time.deltaTime;
+        float force = m_Speed;
+        Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
+
+        if (m_GoForward)
+        {
+            vforce += Vector3.forward;
+        }
+        if (m_GoBackward)
+        {
+            vforce += Vector3.back;
+            force = m_BackSpeed;
+
+        }
+        if (m_GoRight)
+        {
+            vforce += Vector3.right;
+
+        }
+        if (m_GoLeft)
+        {
+            vforce += Vector3.left;
+        }
+
+        vforce = Vector3.Normalize(vforce) * force * m_Baseforce * dTime;
+
+        if (!IsOnGround())
+            vforce = vforce * 0.5f;
+
+        if (m_GoJump)
+        {
+            audio.PlayOneShot(m_JumpingSound);
             vforce += Vector3.up * m_Jump;
             m_JumpHandler.OnJump();
-		}
-		
-		vforce = transform.rotation*vforce;
-		rigidbody.AddForce(vforce);
-        UpdateAnimation();
-	}
- 
+        }
+
+
+        vforce = transform.rotation * vforce;
+        rigidbody.AddForce(vforce);
+
+    }
 
     /**
      *  RespawnPlayer(): 
@@ -250,13 +298,12 @@ public class ControllerScript : MonoBehaviour {
      * */
     public void RespawnPlayer()
     {
-		SaveManager.LoadLastSave();
-        /*transform.position = m_RespawnPosition;
+        transform.position = m_RespawnPosition;
         //transform.rotation = m_RespawnRotation;
         transform.rigidbody.velocity = m_InitialVelocity;
-		m_LocalGravityScript.setGravityDir(m_RespawnGravityDir);
+        m_LocalGravityScript.setGravityDir(m_RespawnGravityDir);
         if (m_WorldHandler.GetCurrentWorldNumber() != PlayerPrefs.GetInt("World"))
-                m_WorldHandler.SwitchWorld();
+            m_WorldHandler.SwitchWorld();
 
         if (m_goToLoad != null)
         {
@@ -266,9 +313,9 @@ public class ControllerScript : MonoBehaviour {
                                             PlayerPrefs.GetFloat(go.name + ".transform.position.x"),
                                             PlayerPrefs.GetFloat(go.name + ".transform.position.y"),
                                             PlayerPrefs.GetFloat(go.name + ".transform.position.z")
-                                          );            
+                                          );
             }
-        }*/
+        }
 
     }
 
@@ -290,8 +337,7 @@ public class ControllerScript : MonoBehaviour {
      * */
     public void SetRespawnPosition(Vector3 newPosition)
     {
-        SaveManager.SaveLastSave();
-		//m_RespawnPosition = newPosition;
+        m_RespawnPosition = newPosition;
     }
 
     /**
@@ -305,14 +351,14 @@ public class ControllerScript : MonoBehaviour {
     {
         m_RespawnRotation = newRotation;
     }
-	
-	public void SetRespawnGravityDir(Vector3 newGravityDir)
+
+    public void SetRespawnGravityDir(Vector3 newGravityDir)
     {
         m_RespawnGravityDir = newGravityDir;
     }
 
-	
-	
+
+
     /**
      * ???????????
      * */
@@ -360,3 +406,5 @@ public class ControllerScript : MonoBehaviour {
         return true;
     }
 }
+
+
