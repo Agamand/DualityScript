@@ -189,7 +189,8 @@ public class GameSave
 public static class SaveManager
 {
 	static GameSave last_save = null;
-	public static void Load(string path)
+	public static bool m_MustLoad = false;
+	public static void LoadFromDisk(string path)
 	{
 		Stream s = System.IO.File.Open(path,System.IO.FileMode.Open);
 		if(s == null)
@@ -199,22 +200,7 @@ public static class SaveManager
 		GameSave gamesave;
 		gamesave = (GameSave)f.Deserialize(s);
 		s.Close();
-		Application.LoadLevel(gamesave.level);
-		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
-		foreach(GameObject go in gameObject)
-		{
-			Save save = gamesave.GetSave(go.GetInstanceID());
-			if(save == null)
-				continue;
-			
-			Saveable savecomponent = go.GetComponent<Saveable>();
-			if(savecomponent == null)
-				continue;
-			
-			Debug.Log("Load object : " + save.m_Id);
-			savecomponent.Load(save);
-		}
-		
+		last_save = gamesave;	
 	}
 	
 	public static void LoadLastSave()
@@ -222,17 +208,18 @@ public static class SaveManager
 		if(last_save == null)
 			return;
 		Debug.Log("LOAD");
-		/*last_save.Seek(0, SeekOrigin.Begin);
-		BinaryFormatter f = new BinaryFormatter();	
-		f.Binder = new VersionDeserializationBinder();
-		GameSave gamesave;
-		gamesave = (GameSave)f.Deserialize(last_save);*/
+		Debug.Log("loadedlevel : " + Application.loadedLevel + ", load level : " + last_save.level);
 		if( Application.loadedLevel != last_save.level)
-			Application.LoadLevel(last_save.level);
+		{
+			m_MustLoad = true;
+			Application.LoadLevel(last_save.level);		
+			return;
+		}
 		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
+		int id = 1;
 		foreach(GameObject go in gameObject)
 		{
-			Save save = last_save.GetSave(go.GetInstanceID());
+			Save save = last_save.GetSave(id);
 			if(save == null)
 				continue;
 			
@@ -242,6 +229,7 @@ public static class SaveManager
 			
 			Debug.Log("Load object : " + save.m_Id);
 			savecomponent.Load(save);
+			id++;
 		}
 		WorldControllerScript worldController = null;
 		GameObject worldControllerGo = GameObject.Find("GameWorld");
@@ -250,11 +238,15 @@ public static class SaveManager
 			if((worldController = worldControllerGo.GetComponent<WorldControllerScript>()) != null)
 				worldController.SetWorld(last_save.world);
 		}
-		
+		m_MustLoad = false;
 	}
+	
+	
 	
 	public static void SaveLastSave()
 	{
+		if(m_MustLoad)
+			return;
 		Debug.Log("SAVE");
 		GameSave gamesave = new GameSave();
 		
@@ -268,46 +260,37 @@ public static class SaveManager
 		
 		
 		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
+		int id = 1;
 		foreach(GameObject go in gameObject)
 		{
 			Saveable savecomponent = null;
 			if((savecomponent = go.GetComponent<Saveable>()) != null)
 			{
 				Save save = savecomponent.SaveTo();
+				save.m_Id = id;
 				Debug.Log ("Save object : " + save.m_Id);
 				gamesave.AddSave(save);
+				id++;
 			}
 		}
 		
 		gamesave.level = Application.loadedLevel;
 		last_save = gamesave;	
-		/*
-		last_save = new MemoryStream();
-		BinaryFormatter f = new BinaryFormatter();	
-		f.Binder = new VersionDeserializationBinder(); 
-		f.Serialize(last_save,gamesave);*/
 	}
 	
-	public static void Save(string path)
+	public static void SaveToDisk(string path)
 	{
-		GameSave gamesave = new GameSave();
-		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
-		foreach(GameObject go in gameObject)
-		{
-			Saveable savecomponent = null;
-			if((savecomponent = go.GetComponent<Saveable>()) != null)
-			{
-				Save save = savecomponent.SaveTo();
-				gamesave.AddSave(save);
-			}
-		}
-		
-		gamesave.level = Application.loadedLevel;
-			
-		Stream s = System.IO.File.Open(path,System.IO.FileMode.CreateNew);
+		if(last_save == null)
+			return;
+		Stream s = System.IO.File.Open(path,System.IO.FileMode.Create);
 		BinaryFormatter f = new BinaryFormatter();	
 		f.Binder = new VersionDeserializationBinder(); 
-		f.Serialize(s,gamesave);
+		f.Serialize(s,last_save);
 		s.Close();
+	}
+	
+	public static bool CheckSaveFile(string path)
+	{
+		return System.IO.File.Exists(path);
 	}
 }
