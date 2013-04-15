@@ -59,9 +59,9 @@ public class WorldControllerScript : MonoBehaviour
     public void SetWorld(int world)
     {
 		m_PlayerCS.CheckIfInsideObject(m_CurrentWorld == 0 ? 9 : 8);
-		
-		if (m_LaserBeamScript != null && m_CurrentWorld != world)
-            m_LaserBeamScript.SwitchState();
+
+        if (m_LaserBeamScript != null)
+            m_LaserBeamScript.SetState(world == 0 ? 8 : 9);
 		
         m_CurrentWorld = world;
 
