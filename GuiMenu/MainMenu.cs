@@ -26,32 +26,37 @@ public class MainMenu : MonoBehaviour {
     private bool m_inverted_mouse = false;
     private Vector2 m_keybindings_scrollPosition = Vector2.zero;
 
+
+    private KeyCode m_go_forward_key;
+    private KeyCode m_go_backward_key;
+    private KeyCode m_strafe_left_key;
+    private KeyCode m_strafe_right_key;
+    private KeyCode m_jump_key;
+    private KeyCode m_switch_world_key;
+    private KeyCode m_carry_object_key;
+    private KeyCode m_respawn_key;
+
     private static String[] m_keybindings_labels = {
                                                "Go Forward", 
                                                "Go Backward", 
                                                "Strafe Left", 
                                                "Strafe Right", 
-                                               "Jump", 
                                                "Switch World", 
-                                               "Flashlight", 
                                                "Carry Object", 
                                                "Respawn"
                                           };
 
     private static String[] m_keybindings_default = {
-                                               "Z", 
-                                               "S", 
-                                               "Q", 
-                                               "D", 
-                                               "Space", 
-                                               "A", 
-                                               "F", 
-                                               "E", 
+                                               "Z",
+                                               "S",
+                                               "Q",
+                                               "D",
+                                               "A",
+                                               "E",
                                                "R"
                                           };
 
-    private String[] m_keybindings;
-
+    private static String[] m_keybindings;
     private String username = "";
     private String password = "";
     private static String[] ratio_string = {"4/3","16/10","16/9"};
@@ -93,10 +98,8 @@ public class MainMenu : MonoBehaviour {
     void Start()
     {
         Screen.showCursor = true;
-        ratio_combobox = new GUIContent[3];
         m_keybindings = new String[m_keybindings_labels.Length];
-        for (int i = 0; i < m_keybindings.Length; i++)
-            m_keybindings[i] = m_keybindings_default[i];
+        ratio_combobox = new GUIContent[3];
         _4_3_combobox = new GUIContent[resolution_4_3.Length];
         _16_10_combobox = new GUIContent[resolution_16_10.Length];
         _16_9_combobox = new GUIContent[resolution_16_9.Length];
@@ -118,6 +121,7 @@ public class MainMenu : MonoBehaviour {
 
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
         InitializePlayerPrefs();
+        LoadKeysFromPrefs();
     }
 
     void InitializePlayerPrefs()
@@ -163,11 +167,38 @@ public class MainMenu : MonoBehaviour {
 
         if (!PlayerPrefs.HasKey("MenuKey"))
         {
-           /* if (Application.isWebPlayer)
-                PlayerPrefs.SetInt("MenuKey", KeyCode.F1);
+            if (Application.isWebPlayer)
+                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.F1);
             else
-                PlayerPrefs.SetInt("MenuKey", KeyCode.Escape);*/
+                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.Escape);
         }
+
+        
+        if (!PlayerPrefs.HasKey("JumpKey"))
+            PlayerPrefs.SetInt("JumpKey", (int)KeyCode.Space);
+
+
+       if (!PlayerPrefs.HasKey("ForwardKey"))
+            PlayerPrefs.SetInt("ForwardKey", (int)KeyCode.Z);
+
+       if (!PlayerPrefs.HasKey("BackwardKey"))
+            PlayerPrefs.SetInt("BackwardKey", (int)KeyCode.S);
+
+       if (!PlayerPrefs.HasKey("StrafeLeftKey"))
+            PlayerPrefs.SetInt("StrafeLeftKey", (int)KeyCode.Q);
+
+       if (!PlayerPrefs.HasKey("StrafeRightKey"))
+            PlayerPrefs.SetInt("StrafeRightKey", (int)KeyCode.D);
+
+       if (!PlayerPrefs.HasKey("SwitchWorldKey"))
+            PlayerPrefs.SetInt("SwitchWorldKey", (int)KeyCode.A);
+
+      if (!PlayerPrefs.HasKey("CarryObjectKey"))
+            PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
+
+      if (!PlayerPrefs.HasKey("RespawnKey"))
+            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
+
 
         PlayerPrefs.Save();
     }
@@ -201,7 +232,17 @@ public class MainMenu : MonoBehaviour {
             m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
             m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
         }
-
+        else if (st.Equals("Controls"))
+        {
+            /*m_go_forward_key =   (KeyCode)PlayerPrefs.GetInt("ForwardKey");
+            m_go_backward_key =  (KeyCode)PlayerPrefs.GetInt("BackwardKey");
+            m_strafe_left_key =  (KeyCode)PlayerPrefs.GetInt("StrafeLeftKey");
+            m_strafe_right_key = (KeyCode)PlayerPrefs.GetInt("StrafeRightKey");
+            m_jump_key =         (KeyCode)PlayerPrefs.GetInt("SwitchWorldKey");
+            m_switch_world_key = (KeyCode)PlayerPrefs.GetInt("JumpKey");
+            m_carry_object_key = (KeyCode)PlayerPrefs.GetInt("CarryObjectKey");
+            m_respawn_key =      (KeyCode)PlayerPrefs.GetInt("RespawnKey");*/
+        }
     }
 
     void SetPlayerPrefs(String st = "")
@@ -216,6 +257,7 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
             PlayerPrefs.SetFloat("SoundVolume", m_sound_effects_volume / 10);
             PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
+
         }
         else if (st.Equals("video"))
         {
@@ -234,8 +276,122 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
         }
 
+        else if (st.Equals("Controls"))
+        {
+        }
+
         PlayerPrefs.Save();
     }
+
+    KeyCode GetKeyCode(String st)
+    {
+        String st2 = st.ToUpper();
+
+        switch (st2)
+        {
+            case "A": return KeyCode.A;
+            case "B": return KeyCode.B;
+            case "C": return KeyCode.C;
+            case "D": return KeyCode.D;
+            case "E": return KeyCode.E;
+            case "F": return KeyCode.F;
+            case "G": return KeyCode.G;
+            case "H": return KeyCode.H;
+            case "I": return KeyCode.I;
+            case "J": return KeyCode.J;
+            case "K": return KeyCode.K;
+            case "L": return KeyCode.L;
+            case "M": return KeyCode.M;
+            case "N": return KeyCode.N;
+            case "O": return KeyCode.O;
+            case "P": return KeyCode.P;
+            case "Q": return KeyCode.Q;
+            case "R": return KeyCode.R;
+            case "S": return KeyCode.S;
+            case "T": return KeyCode.T;
+            case "U": return KeyCode.U;
+            case "V": return KeyCode.V;
+            case "W": return KeyCode.W;
+            case "X": return KeyCode.X;
+            case "Y": return KeyCode.Y;
+            case "Z": return KeyCode.Z;
+        }
+        return KeyCode.Dollar;
+    }
+
+    String GetStringFromKeycode(KeyCode kc)
+    {
+        switch (kc)
+        {
+            case KeyCode.A : return "A";
+            case KeyCode.B : return "B";
+            case KeyCode.C : return "C";
+            case KeyCode.D : return "D";
+            case KeyCode.E : return "E";
+            case KeyCode.F : return "F";
+            case KeyCode.G : return "G";
+            case KeyCode.H : return "H";
+            case KeyCode.I : return "I";
+            case KeyCode.J : return "J";
+            case KeyCode.K : return "K";
+            case KeyCode.L : return "L";
+            case KeyCode.M : return "M";
+            case KeyCode.N : return "N";
+            case KeyCode.O : return "O";
+            case KeyCode.P : return "P";
+            case KeyCode.Q : return "Q";
+            case KeyCode.R : return "R";
+            case KeyCode.S : return "S";
+            case KeyCode.T : return "T";
+            case KeyCode.U : return "U";
+            case KeyCode.V : return "V";
+            case KeyCode.W : return "W";
+            case KeyCode.X : return "X";
+            case KeyCode.Y : return "Y";
+            case KeyCode.Z : return "Z";
+        }
+        return "nc";
+    }
+
+    void LoadKeysFromPrefs()
+    {
+        m_keybindings[0] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("ForwardKey"));
+        m_keybindings[1] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("BackwardKey"));
+        m_keybindings[2] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey"));
+        m_keybindings[3] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeRightKey"));
+        m_keybindings[4] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey"));
+        m_keybindings[5] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("CarryObjectKey"));
+        m_keybindings[6] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("RespawnKey"));
+    }
+
+
+    void SetKeysPlayerPrefs()
+    {
+        KeyCode kb;
+        kb = GetKeyCode(m_keybindings[0]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("ForwardKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[1]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("BackwardKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[2]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("StrafeLeftKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[3]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("StrafeRightKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[4]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("SwitchWorldKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[5]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("CarryObjectKey", (int)kb);
+        kb = GetKeyCode(m_keybindings[6]);
+        if (kb != KeyCode.Dollar)
+            PlayerPrefs.SetInt("RespawnKey", (int)kb);
+    }
+
+
 
     void OnGUI()
     {
@@ -440,35 +596,42 @@ public class MainMenu : MonoBehaviour {
         }
         if (submenu == SubMenuSelected.CONTROLS_SELECTED)
         {
+
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Controls Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(260, 120, 500, 400)));
             GUI.Label(ResizeGUI(new Rect(10, 30, 70, 40)), "Keybindings :", skin.label);
             //Key Bindings
             GUI.Box(ResizeGUI(new Rect(80, 30, 400, 250)), "", skin.box);
             m_keybindings_scrollPosition = GUI.BeginScrollView(ResizeGUI(new Rect(80, 30, 400, 250)), m_keybindings_scrollPosition, ResizeGUI(new Rect(0, 0, 200, 25 * (m_keybindings_labels.Length + 1))));
-            for (int i = 0; i < m_keybindings_labels.Length; i++)
+
+            int i;
+            for (i = 0; i < m_keybindings_labels.Length - 1; i++)
             {
                 GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), m_keybindings_labels[i] + " :", skin.label);
-                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings[i], skin.textField);
+                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 20)), m_keybindings[i], 1, skin.textField);
             }
+            GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), m_keybindings_labels[i] + " :", skin.label);
+            GUI.Label(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 40)), "Space", skin.label);
+            i++;
+            GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), "Pause :", skin.label);
+            GUI.Label(ResizeGUI(new Rect(130, 25 * (i + 1), 150, 40)), "Escape (F1 on Webplayer)", skin.label);
+
+
 
             GUI.EndScrollView();
             //End Key Bindings
 
-            GUI.Button(ResizeGUI(new Rect(420, 290, 60, 20)), "Apply", skin.button);
-            GUI.Button(ResizeGUI(new Rect(350, 290, 60, 20)), "Default", skin.button);
-
-            /*
+            if (GUI.Button(ResizeGUI(new Rect(420, 290, 60, 20)), "Apply", skin.button))
+            {
+                SetKeysPlayerPrefs();
+                LoadKeysFromPrefs();
+            }
             if (GUI.Button(ResizeGUI(new Rect(350, 290, 60, 20)), "Default", skin.button))
             {
-                print("Revert to default values");
-                for (int i = 0; i < m_keybindings.Length; i++)
-                {
-                    m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings_default[i], skin.textField);
-                    m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 15)), m_keybindings[i], skin.textField);
-                }
-            }*/
-
+                m_keybindings = m_keybindings_default;
+                SetKeysPlayerPrefs();
+                LoadKeysFromPrefs();
+            }
 
             GUI.Label(ResizeGUI(new Rect(20, 290, 150, 40)), "Mouse Sensitivity", skin.label);
             m_mouse_sensitivity = GUI.HorizontalSlider(ResizeGUI(new Rect(20, 315, 150, 10)), m_mouse_sensitivity, 0.1f, 10.0f, skin.horizontalSlider, skin.horizontalSliderThumb);
