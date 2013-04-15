@@ -23,7 +23,7 @@ public class LaserBeamScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        m_LaserBeams = GameObject.FindGameObjectsWithTag("laserBeam");
+        m_LaserBeams = GameObject.FindGameObjectsWithTag("LaserBeam");
         m_LineRenderers = new LineRenderer[m_LaserBeams.Length];
         for (int i = 0; i < m_LaserBeams.Length; i++)
             m_LineRenderers[i] = m_LaserBeams[i].GetComponent<LineRenderer>();
