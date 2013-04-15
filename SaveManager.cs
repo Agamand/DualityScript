@@ -6,7 +6,8 @@ using System.IO;
 using System.Runtime.Serialization;
 using System;
 using System.Reflection;
-
+using System.Xml;
+using System.Xml.Serialization;
 
 public sealed class VersionDeserializationBinder : SerializationBinder 
 { 
@@ -29,10 +30,14 @@ public sealed class VersionDeserializationBinder : SerializationBinder
 
 
 [System.Serializable]
+[XmlRoot("vec3")]
 public class Vector3Serializable
 {
+	[XmlAttribute("x")]
 	public float x = 0f;
+	[XmlAttribute("y")]
 	public float y = 0f;
+	[XmlAttribute("z")]
 	public float z = 0f;
 	
 	public Vector3Serializable()
@@ -60,11 +65,16 @@ public class Vector3Serializable
 }
 
 [System.Serializable]
+[XmlRoot("quat")]
 public class QuaternionSerializable
 {
+	[XmlAttribute("x")]
 	public float x = 0f;
+	[XmlAttribute("y")]
 	public float y = 0f;
+	[XmlAttribute("z")]
 	public float z = 0f;
+	[XmlAttribute("w")]
 	public float w = 0f;
 	
 	public QuaternionSerializable()
@@ -121,9 +131,11 @@ public class TransformSerializable
 }
 
 [System.Serializable]
+[XmlRoot("rigidbody")]
 public class RigidBodySerializable
 {
 	public Vector3Serializable velocity = new Vector3Serializable();
+	
 	public Vector3Serializable angularVelocity = new Vector3Serializable();
 	
 	public RigidBodySerializable()
@@ -147,10 +159,19 @@ public class RigidBodySerializable
 [System.Serializable]
 public class Save
 {
+	[XmlAttribute("id")]
 	public int m_Id;
+	
 	public TransformSerializable m_Transform = new TransformSerializable();
+	
 	public RigidBodySerializable m_RigidBody = new RigidBodySerializable();
+	
 	public Vector3Serializable m_Gravity = new Vector3Serializable();
+	
+	public Save()
+	{
+		m_Id = 0;
+	}
 	public Save(int id)
 	{
 		m_Id = id;
@@ -159,30 +180,32 @@ public class Save
 
 
 [System.Serializable]
+[XmlRoot("gamesave")]
 public class GameSave
 {
+	[XmlAttribute("level")]
 	public int level;
+	[XmlAttribute("world")]
 	public int world;
-	private Dictionary<int,Save> m_SaveMaps;
+	
+ 	[XmlArray("Saves")]
+ 	[XmlArrayItem("Save")]
+	public List<Save> m_Saves;
 	public GameSave()
 	{
-		m_SaveMaps = new Dictionary<int,Save>();
+		m_Saves = new List<Save>();
 	}
 	
 	public void AddSave(Save save)
 	{
-		m_SaveMaps.Add(save.m_Id,save);
+		m_Saves.Add(save);
 	}
 	
 	public Save GetSave(int id)
 	{
-		try
-		{
-			return m_SaveMaps[id];
-		}catch(KeyNotFoundException e)
-		{
-			return null;
-		}
+		if(--id < m_Saves.Count)
+			return m_Saves[id];
+		return null;
 	}
 }
 
@@ -190,17 +213,33 @@ public static class SaveManager
 {
 	static GameSave last_save = null;
 	public static bool m_MustLoad = false;
-	public static void LoadFromDisk(string path)
+	private static string m_FilePath = Application.dataPath + "/save.dat";
+	public static void LoadFromDisk()
 	{
-		Stream s = System.IO.File.Open(path,System.IO.FileMode.Open);
-		if(s == null)
-			return;
-		BinaryFormatter f = new BinaryFormatter();	
-		f.Binder = new VersionDeserializationBinder();
-		GameSave gamesave;
-		gamesave = (GameSave)f.Deserialize(s);
-		s.Close();
-		last_save = gamesave;	
+		if(true)
+		{
+			var serializer = new XmlSerializer(typeof(GameSave));
+		 	if(!PlayerPrefs.HasKey("save"))
+				return;
+			
+			TextReader textReader = new StringReader(PlayerPrefs.GetString("save"));			
+			GameSave gamesave;
+		 	gamesave = (GameSave)serializer.Deserialize(textReader);
+			last_save = gamesave;
+			
+		}
+		else
+		{
+			Stream s = System.IO.File.Open(m_FilePath,System.IO.FileMode.Open);
+			if(s == null)
+				return;
+			BinaryFormatter f = new BinaryFormatter();	
+			f.Binder = new VersionDeserializationBinder();
+			GameSave gamesave;
+			gamesave = (GameSave)f.Deserialize(s);
+			s.Close();
+			last_save = gamesave;
+		}
 	}
 	
 	public static void LoadLastSave()
@@ -209,6 +248,7 @@ public static class SaveManager
 			return;
 		Debug.Log("LOAD");
 		Debug.Log("loadedlevel : " + Application.loadedLevel + ", load level : " + last_save.level);
+		
 		if( Application.loadedLevel != last_save.level)
 		{
 			m_MustLoad = true;
@@ -217,11 +257,11 @@ public static class SaveManager
 		}
 		GameObject[] gameObject = (GameObject[])GameObject.FindObjectsOfType(typeof(GameObject));
 		int id = 1;
+		Save save = last_save.GetSave(id);
 		foreach(GameObject go in gameObject)
 		{
-			Save save = last_save.GetSave(id);
 			if(save == null)
-				continue;
+				break;
 			
 			Saveable savecomponent = go.GetComponent<Saveable>();
 			if(savecomponent == null)
@@ -230,6 +270,7 @@ public static class SaveManager
 			Debug.Log("Load object : " + save.m_Id);
 			savecomponent.Load(save);
 			id++;
+			save = last_save.GetSave(id);
 		}
 		WorldControllerScript worldController = null;
 		GameObject worldControllerGo = GameObject.Find("GameWorld");
@@ -278,19 +319,33 @@ public static class SaveManager
 		last_save = gamesave;	
 	}
 	
-	public static void SaveToDisk(string path)
+	public static void SaveToDisk()
 	{
 		if(last_save == null)
 			return;
-		Stream s = System.IO.File.Open(path,System.IO.FileMode.Create);
-		BinaryFormatter f = new BinaryFormatter();	
-		f.Binder = new VersionDeserializationBinder(); 
-		f.Serialize(s,last_save);
-		s.Close();
+		
+		if(true)
+		{
+			var serializer = new XmlSerializer(typeof(GameSave));
+			String str = "";
+			TextWriter textWriter = new StringWriter();
+		 	serializer.Serialize(textWriter,last_save);
+			PlayerPrefs.SetString("save",textWriter.ToString());
+		}
+		else
+		{
+			Stream s = System.IO.File.Open(m_FilePath,System.IO.FileMode.Create);
+			BinaryFormatter f = new BinaryFormatter();	
+			f.Binder = new VersionDeserializationBinder(); 
+			f.Serialize(s,last_save);
+			s.Close();
+		}
 	}
 	
-	public static bool CheckSaveFile(string path)
+	public static bool CheckSaveFile()
 	{
-		return System.IO.File.Exists(path);
+		if(true)
+			return PlayerPrefs.HasKey("save");
+		return System.IO.File.Exists(m_FilePath);
 	}
 }
