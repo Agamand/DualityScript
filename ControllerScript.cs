@@ -98,6 +98,8 @@ public class ControllerScript : MonoBehaviour
         Screen.lockCursor = true;
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
+		if(SaveManager.m_MustLoad)
+			SaveManager.LoadLastSave();
     }
 
     /**
@@ -243,7 +245,16 @@ public class ControllerScript : MonoBehaviour
             m_WorldHandler.SwitchWorld();
             //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
         }
-
+		
+		if(Input.GetKeyDown(KeyCode.F5))
+			SaveManager.SaveToDisk("save.dat");
+		
+		if(Input.GetKeyDown(KeyCode.F9))
+		{
+			SaveManager.LoadFromDisk("save.dat");
+			SaveManager.LoadLastSave();
+		}
+		
         Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
 
         if (Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
