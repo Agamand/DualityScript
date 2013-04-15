@@ -74,7 +74,6 @@ public class ControllerScript : MonoBehaviour
     private float m_AnimationTimer = 0.0f;
     private const float m_AnimationTime = 1.0f;
     private bool m_IsInAnimation = false;
-    private GameObject m_FlashLight = null;
     private GameObject m_Camera;
 
 
@@ -93,8 +92,6 @@ public class ControllerScript : MonoBehaviour
         m_RespawnGravityDir = m_LocalGravityScript.GetStartDir();
         m_AttachToPlayer = GameObject.Find("Grabber").GetComponent<AttachToPlayerScript>();
         m_Camera = transform.FindChild("Camera").gameObject;
-        m_FlashLight = GameObject.Find("Light");
-        ToggleFlashLight();
         Screen.lockCursor = true;
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
@@ -140,7 +137,6 @@ public class ControllerScript : MonoBehaviour
         m_Incl += inclInc;
 
         m_Camera.transform.Rotate(Vector3.right, inclInc);
-        m_FlashLight.transform.Rotate(Vector3.right, inclInc);
     }
 
     public void AddDataToLoad(GameObject[] gameObjects)
@@ -182,22 +178,14 @@ public class ControllerScript : MonoBehaviour
         m_IsInAnimation = true;
     }
 
-    /**
-     *  ToggleFlashLight
-     *      --> Allows the player to switch the flashlight on and off
-     * */
-    private void ToggleFlashLight()
-    {
-        m_FlashLight.SetActive(!m_FlashLight.activeInHierarchy);
-    }
-
     void Update()
     {
+
         m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
         UpdateMouse();
         transform.Rotate(Vector3.up, m_Rot_Y);
 
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
             Application.LoadLevel("menu_config_scene");
 
         if (Input.GetButton("Go Forward"))
@@ -247,11 +235,11 @@ public class ControllerScript : MonoBehaviour
         }
 		
 		if(Input.GetKeyDown(KeyCode.F5))
-			SaveManager.SaveToDisk("save.dat");
+			SaveManager.SaveToDisk();
 		
 		if(Input.GetKeyDown(KeyCode.F9))
 		{
-			SaveManager.LoadFromDisk("save.dat");
+			SaveManager.LoadFromDisk();
 			SaveManager.LoadLastSave();
 		}
 		
