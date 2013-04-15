@@ -51,10 +51,19 @@ public class CheckpointScript : MonoBehaviour {
         }
     }
 	
+	public bool GetActive()
+	{
+		return m_Activated;
+	}
+	
+	public void SetActive(bool active)
+	{
+		m_Activated = active;
+	}
+	
 	public void setRespawnIntel(){
+		m_Activated = false;
         m_Cs.SetRespawnPosition(gameObject.transform.position);
-        m_Cs.SetRespawnRotation(m_PlayerRotationOnSpawn);
-		m_Cs.SetRespawnGravityDir(m_PlayerGravityDirOnSpawn);
         /*Debug.Log("Entered in checkpoint, instantiated values are :");
         foreach (GameObject go in m_GameObjects)
         {
@@ -63,7 +72,7 @@ public class CheckpointScript : MonoBehaviour {
         SaveSerializedData();
         m_Cs.AddDataToLoad(m_GameObjects);*/
         //gameObject.SetActive(false);
-        m_Activated = false;
+        
 	}
 	
     void SaveSerializedData()

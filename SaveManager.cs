@@ -60,7 +60,6 @@ public class Vector3Serializable
 		v.x = x;
 		v.y = y;
 		v.z = z;
-		Debug.Log("COPY : " + v.ToString());
 	}
 }
 
@@ -90,7 +89,6 @@ public class QuaternionSerializable
 	
 	public Quaternion ToQuaternion()
 	{
-		Debug.Log("(" + x + ", " + y + ", " + z + ", " + w + ")"); 
 		return new Quaternion(x,y,z,w);
 	}
 	
@@ -124,9 +122,7 @@ public class TransformSerializable
 	{
 		t.localPosition = position.ToVector3();
 		t.localRotation = rotation.ToQuaternion();
-		Debug.Log(t.rotation.ToString());
 		t.localScale = scale.ToVector3();
-		Debug.Log("COPY POS : " + t.position.ToString()); 
 	}
 }
 
@@ -162,11 +158,16 @@ public class Save
 	[XmlAttribute("id")]
 	public int m_Id;
 	
+	public string m_Name;
+	
 	public TransformSerializable m_Transform = new TransformSerializable();
 	
 	public RigidBodySerializable m_RigidBody = new RigidBodySerializable();
 	
 	public Vector3Serializable m_Gravity = new Vector3Serializable();
+	
+	[XmlAttribute("enable")]
+	public bool m_Enable;
 	
 	public Save()
 	{
@@ -187,6 +188,13 @@ public class GameSave
 	public int level;
 	[XmlAttribute("world")]
 	public int world;
+	
+	[XmlAttribute("score")]
+	public int score = 0;
+	[XmlAttribute("time")]
+	public float time = 0;
+	[XmlAttribute("death")]
+	public int deathCount = 0;
 	
  	[XmlArray("Saves")]
  	[XmlArrayItem("Save")]
@@ -211,9 +219,10 @@ public class GameSave
 
 public static class SaveManager
 {
-	static GameSave last_save = null;
+	public static GameSave last_save = null;
 	public static bool m_MustLoad = false;
 	private static string m_FilePath = Application.dataPath + "/save.dat";
+
 	public static void LoadFromDisk()
 	{
 		if(true)
@@ -247,8 +256,6 @@ public static class SaveManager
 		if(last_save == null)
 			return;
 		Debug.Log("LOAD");
-		Debug.Log("loadedlevel : " + Application.loadedLevel + ", load level : " + last_save.level);
-		
 		if( Application.loadedLevel != last_save.level)
 		{
 			m_MustLoad = true;
@@ -267,7 +274,9 @@ public static class SaveManager
 			if(savecomponent == null)
 				continue;
 			
-			Debug.Log("Load object : " + save.m_Id);
+			if(!go.name.Equals(save.m_Name))
+				Debug.Log("WHAT IN THE HELL! " + go.name + "!=" + save.m_Name);
+			
 			savecomponent.Load(save);
 			id++;
 			save = last_save.GetSave(id);
@@ -309,19 +318,24 @@ public static class SaveManager
 			{
 				Save save = savecomponent.SaveTo();
 				save.m_Id = id;
-				Debug.Log ("Save object : " + save.m_Id);
 				gamesave.AddSave(save);
 				id++;
 			}
 		}
 		
 		gamesave.level = Application.loadedLevel;
+		if(last_save != null)
+		{
+			gamesave.time = last_save.time;
+			gamesave.deathCount = last_save.deathCount;
+			gamesave.score = last_save.score;
+		}
 		last_save = gamesave;	
 	}
 	
 	public static void SaveToDisk()
 	{
-		if(last_save == null)
+		if(last_save == null && PlayerPrefs.HasKey("playthrough") && PlayerPrefs.GetInt("playthrough") == 0)
 			return;
 		
 		if(true)

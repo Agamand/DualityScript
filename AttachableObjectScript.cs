@@ -53,4 +53,9 @@ public class AttachableObjectScript : MonoBehaviour {
     {
         m_Grabber = grabber;
     }
+	
+	public GameObject GetGrabber()
+	{
+		return m_Grabber;
+	}
 }

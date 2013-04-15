@@ -50,7 +50,7 @@ public class LocalGravityScript : MonoBehaviour {
     /**
      * ???????????????????????
      * */
-    public void setGravityDir(Vector3 newGravity)
+    public void setGravityDir(Vector3 newGravity, bool playerAnim = true)
     {
         float mass = m_Body ? m_Body.mass : 1.0f;
 
@@ -58,9 +58,8 @@ public class LocalGravityScript : MonoBehaviour {
         m_Gravity = newGravity;
         m_Gravity *= m_gravityAcceleration;
         m_ConstForce.force = m_Gravity * mass;
-
-        Debug.Log("Change Gravity Dir, from " + old.ToString() + " to " + newGravity.ToString());
-        if (m_Player)
+		
+        if (m_Player && playerAnim)
             m_Player.OnChangeGravity(old, newGravity);
 
     }
