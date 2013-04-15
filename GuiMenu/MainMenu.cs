@@ -26,16 +26,6 @@ public class MainMenu : MonoBehaviour {
     private bool m_inverted_mouse = false;
     private Vector2 m_keybindings_scrollPosition = Vector2.zero;
 
-
-    private KeyCode m_go_forward_key;
-    private KeyCode m_go_backward_key;
-    private KeyCode m_strafe_left_key;
-    private KeyCode m_strafe_right_key;
-    private KeyCode m_jump_key;
-    private KeyCode m_switch_world_key;
-    private KeyCode m_carry_object_key;
-    private KeyCode m_respawn_key;
-
     private static String[] m_keybindings_labels = {
                                                "Go Forward", 
                                                "Go Backward", 
@@ -78,6 +68,8 @@ public class MainMenu : MonoBehaviour {
 
     public Texture[] level_images;
 
+    private String highScoresSt;
+
     enum MainMenuSelected
     {
         NO_SELECTED,
@@ -94,10 +86,13 @@ public class MainMenu : MonoBehaviour {
         ACCOUNT_SELECTED
     }
 
+    private DataBaseHandling m_db_handler;
+
 
     void Start()
     {
         Screen.showCursor = true;
+        Screen.lockCursor = false;
         m_keybindings = new String[m_keybindings_labels.Length];
         ratio_combobox = new GUIContent[3];
         _4_3_combobox = new GUIContent[resolution_4_3.Length];
@@ -122,12 +117,17 @@ public class MainMenu : MonoBehaviour {
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
         InitializePlayerPrefs();
         LoadKeysFromPrefs();
+        LoadFromPlayerPrefs("video");
+        m_db_handler = gameObject.AddComponent<DataBaseHandling>();
     }
 
     void InitializePlayerPrefs()
     {
         if (!PlayerPrefs.HasKey("MaxLevelReached"))
             PlayerPrefs.SetInt("MaxLevelReached", 1);
+
+        if (!PlayerPrefs.HasKey("Score"))
+            PlayerPrefs.SetFloat("Score", 0);
 
         if (!PlayerPrefs.HasKey("ElapsedTime"))
             PlayerPrefs.SetFloat("ElapsedTime", 0);
@@ -150,7 +150,9 @@ public class MainMenu : MonoBehaviour {
         if (!PlayerPrefs.HasKey("QualityLevel"))//Récupérer qualité du launcher
             PlayerPrefs.SetInt("QualityLevel", 3);
 
-        if (!PlayerPrefs.HasKey("Fullscreen"))
+        if (Application.isWebPlayer)
+            PlayerPrefs.SetInt("Fullscreen", 0);
+        else if (!PlayerPrefs.HasKey("Fullscreen"))
             PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
         
         if (!PlayerPrefs.HasKey("DisplayScore")) //NOT IMPLEMENTED
@@ -173,10 +175,8 @@ public class MainMenu : MonoBehaviour {
                 PlayerPrefs.SetInt("MenuKey", (int)KeyCode.Escape);
         }
 
-        
         if (!PlayerPrefs.HasKey("JumpKey"))
             PlayerPrefs.SetInt("JumpKey", (int)KeyCode.Space);
-
 
        if (!PlayerPrefs.HasKey("ForwardKey"))
             PlayerPrefs.SetInt("ForwardKey", (int)KeyCode.Z);
@@ -198,6 +198,12 @@ public class MainMenu : MonoBehaviour {
 
       if (!PlayerPrefs.HasKey("RespawnKey"))
             PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
+
+      if (!PlayerPrefs.HasKey("MouseSensitivity"))
+          PlayerPrefs.SetFloat("MouseSensitivity", 80);
+
+      if (!PlayerPrefs.HasKey("InvertedMouse"))
+          PlayerPrefs.SetInt("InvertedMouse", 0);
 
 
         PlayerPrefs.Save();
@@ -232,16 +238,10 @@ public class MainMenu : MonoBehaviour {
             m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
             m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
         }
-        else if (st.Equals("Controls"))
+        else if (st.Equals("controls"))
         {
-            /*m_go_forward_key =   (KeyCode)PlayerPrefs.GetInt("ForwardKey");
-            m_go_backward_key =  (KeyCode)PlayerPrefs.GetInt("BackwardKey");
-            m_strafe_left_key =  (KeyCode)PlayerPrefs.GetInt("StrafeLeftKey");
-            m_strafe_right_key = (KeyCode)PlayerPrefs.GetInt("StrafeRightKey");
-            m_jump_key =         (KeyCode)PlayerPrefs.GetInt("SwitchWorldKey");
-            m_switch_world_key = (KeyCode)PlayerPrefs.GetInt("JumpKey");
-            m_carry_object_key = (KeyCode)PlayerPrefs.GetInt("CarryObjectKey");
-            m_respawn_key =      (KeyCode)PlayerPrefs.GetInt("RespawnKey");*/
+            m_mouse_sensitivity = PlayerPrefs.GetFloat("MouseSensitivity") / 10;
+            m_inverted_mouse = PlayerPrefs.GetInt("InvertedMouse") == 1 ? false : true;
         }
     }
 
@@ -276,8 +276,10 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
         }
 
-        else if (st.Equals("Controls"))
+        else if (st.Equals("controls"))
         {
+            PlayerPrefs.SetFloat("MouseSensitivity", m_mouse_sensitivity * 10);
+            PlayerPrefs.SetInt("InvertedMouse", m_inverted_mouse ? -1 : 1);
         }
 
         PlayerPrefs.Save();
@@ -400,7 +402,9 @@ public class MainMenu : MonoBehaviour {
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "New game", skin.button))
         {
-            print("Lancement nouvelle partie");
+            PlayerPrefs.SetFloat("Score", 0);
+            PlayerPrefs.SetFloat("ElapsedTime", 0);
+            PlayerPrefs.SetInt("DeathCount", 0);
             Application.LoadLevel("level_one");
         }
 
@@ -434,6 +438,8 @@ public class MainMenu : MonoBehaviour {
         }
         if (GUI.Button(ResizeGUI(new Rect(20, 350, 100, 30)), "High-Score", skin.button))
         {
+            m_db_handler.FetchScores();
+
             if (menu != MainMenuSelected.SCORE_SELECTED)
             {
                 menu = MainMenuSelected.SCORE_SELECTED;
@@ -500,7 +506,29 @@ public class MainMenu : MonoBehaviour {
        
         if (menu == MainMenuSelected.SCORE_SELECTED)
         {
-            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "High-Scores", skin.box);
+            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "High Scores", skin.box);
+            String[] tab = m_db_handler.getScoresTab();
+
+            if (tab.Length == 0)
+                GUI.Box(ResizeGUI(new Rect(385, 200, 250, 200)), "Loading Scores", skin.box);
+            else
+            {
+                int i = 0;
+                GUI.Label(ResizeGUI(new Rect(270 + (i++ * 100), 150, 100, 30)), "Rank", skin.label);
+                GUI.Label(ResizeGUI(new Rect(270 + (i++ * 100), 150, 100, 30)), "Username", skin.label);
+                GUI.Label(ResizeGUI(new Rect(270 + (i++ * 100), 150, 100, 30)), "Time", skin.label);
+                GUI.Label(ResizeGUI(new Rect(270 + (i++ * 100), 150, 100, 30)), "Deathcount", skin.label);
+                GUI.Label(ResizeGUI(new Rect(270 + (i++ * 100), 150, 100, 30)), "Score", skin.label);
+
+                int c = 0;
+                for (int j = 0; j < tab.Length / 5; j++)
+                {
+                    for (i = 0; i < 5; i++)
+                    {
+                        GUI.Label(ResizeGUI(new Rect(270 + (i * 100), 180 + (j * 30), 100, 30)), tab[c++], skin.label);
+                    }
+                }
+            }
         }
 
         
@@ -596,6 +624,7 @@ public class MainMenu : MonoBehaviour {
         }
         if (submenu == SubMenuSelected.CONTROLS_SELECTED)
         {
+            LoadFromPlayerPrefs("controls");
 
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Controls Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(260, 120, 500, 400)));
@@ -603,12 +632,13 @@ public class MainMenu : MonoBehaviour {
             //Key Bindings
             GUI.Box(ResizeGUI(new Rect(80, 30, 400, 250)), "", skin.box);
             m_keybindings_scrollPosition = GUI.BeginScrollView(ResizeGUI(new Rect(80, 30, 400, 250)), m_keybindings_scrollPosition, ResizeGUI(new Rect(0, 0, 200, 25 * (m_keybindings_labels.Length + 1))));
+            GUI.Label(ResizeGUI(new Rect(10, 0, 300, 40)), "You can click and type any letter from A to Z to assign it", skin.label);
 
             int i;
             for (i = 0; i < m_keybindings_labels.Length - 1; i++)
             {
                 GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), m_keybindings_labels[i] + " :", skin.label);
-                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 20)), m_keybindings[i], 1, skin.textField);
+                m_keybindings[i] = GUI.TextField(ResizeGUI(new Rect(130, 25 * (i + 1), 20, 20)), m_keybindings[i], 1, skin.textField);
             }
             GUI.Label(ResizeGUI(new Rect(10, 25 * (i + 1), 80, 40)), m_keybindings_labels[i] + " :", skin.label);
             GUI.Label(ResizeGUI(new Rect(130, 25 * (i + 1), 80, 40)), "Space", skin.label);
@@ -641,6 +671,8 @@ public class MainMenu : MonoBehaviour {
             m_inverted_mouse = GUI.Toggle(ResizeGUI(new Rect(110, 330, 70, 20)), m_inverted_mouse, m_inverted_mouse == true ? "  Inverted" : "  Classic", skin.toggle);
 
             GUI.EndGroup();
+
+            SetPlayerPrefs("controls");
         }
         if (submenu == SubMenuSelected.ACCOUNT_SELECTED)
         {

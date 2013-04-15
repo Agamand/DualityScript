@@ -121,6 +121,7 @@ public class ControllerScript : MonoBehaviour
      * */
     private void UpdateMouse()
     {
+        m_MouseSpeed = PlayerPrefs.GetFloat("MouseSensitivity");
         float inclInc = Input.GetAxis("Vertical") * m_MouseSpeed * Time.deltaTime;
         m_Rot_Y = Input.GetAxis("Horizontal") * m_MouseSpeed * Time.deltaTime;
         m_Rot_Y = Modulof(m_Rot_Y, 360.0f);
@@ -136,7 +137,7 @@ public class ControllerScript : MonoBehaviour
 
         m_Incl += inclInc;
 
-        m_Camera.transform.Rotate(Vector3.right, inclInc);
+        m_Camera.transform.Rotate(Vector3.right, (float)PlayerPrefs.GetInt("InvertedMouse")*inclInc);
     }
 
     public void AddDataToLoad(GameObject[] gameObjects)
@@ -188,33 +189,33 @@ public class ControllerScript : MonoBehaviour
         if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
             Application.LoadLevel("menu_config_scene");
 
-        if (Input.GetButton("Go Forward"))
+        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("ForwardKey")))
             m_GoForward = true;
         else
             m_GoForward = false;
 
-        if (Input.GetButton("Go Backward"))
+        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("BackwardKey")))
             m_GoBackward = true;
         else
             m_GoBackward = false;
 
-        if (Input.GetButton("Strafe Right"))
+        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeRightKey")))
             m_GoRight = true;
         else
             m_GoRight = false;
 
 
-        if (Input.GetButton("Strafe Left"))
+        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey")))
             m_GoLeft = true;
         else
             m_GoLeft = false;
 
-        if (Input.GetButtonDown("Respawn"))
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("RespawnKey")))
         {
             RespawnPlayer();
         }
 
-        if (Input.GetButtonDown("Carry Object"))
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("CarryObjectKey")))
         {
             if (m_AttachToPlayer.IsGrabbing())
                 m_AttachToPlayer.Release();
@@ -222,12 +223,7 @@ public class ControllerScript : MonoBehaviour
                 m_AttachToPlayer.Grab();
         }
 
-        if (Input.GetButtonDown("Flashlight"))
-        {
-            ToggleFlashLight();
-        }
-
-        if (Input.GetButtonDown("Switch World"))
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey")))
         {
             audio.PlayOneShot(m_SwitchWorldSound, PlayerPrefs.GetFloat("SoundVolume"));
             m_WorldHandler.SwitchWorld();
@@ -245,7 +241,7 @@ public class ControllerScript : MonoBehaviour
 		
         Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
 
-        if (Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("JumpKey")) && m_JumpHandler.CanJump())
         {
             audio.PlayOneShot(m_JumpingSound, PlayerPrefs.GetFloat("SoundVolume"));
             vforce += Vector3.up * m_Jump;
