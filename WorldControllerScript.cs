@@ -35,7 +35,26 @@ public class WorldControllerScript : MonoBehaviour
         m_ScreenEffet = GameObject.Find("ScreenEffectGlobalScript").GetComponent<ScreenEffectScript>();
 		m_PlayerJumper = GameObject.FindGameObjectWithTag("Jumper").GetComponent<JumperScript>();
         Physics.IgnoreLayerCollision(8, 9);
-        SetWorld(0);
+
+        Physics.IgnoreLayerCollision(10, 8, m_CurrentWorld != 0);
+        Physics.IgnoreLayerCollision(10, 9, m_CurrentWorld == 0);
+
+        GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
+
+        foreach (GameObject go in gos)
+        {
+            if (go.layer == 8 || go.layer == 9)
+            {
+                if (go.GetComponent<Renderer>() != null)
+                {
+                    Color c = go.renderer.material.HasProperty("_Color") ? go.renderer.material.color : Color.black;
+                    c.a = m_CurrentWorld == 0 && go.layer == 8 || m_CurrentWorld != 0 && go.layer == 9 ? 1.0f : 0.3f;
+                    go.renderer.material.color = c;
+                }
+            }
+        }
+
+        m_ScreenEffet.Disable();
     }
 
     /**
@@ -67,8 +86,8 @@ public class WorldControllerScript : MonoBehaviour
 
         Physics.IgnoreLayerCollision(10, 8, m_CurrentWorld != 0);
         Physics.IgnoreLayerCollision(10, 9, m_CurrentWorld == 0);
-        //Debug.Log("current_world : " + m_CurrentWorld);
-		GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
+
+        GameObject[] gos = (GameObject[])FindObjectsOfType(typeof(GameObject));
 		m_PlayerJumper.SetMaxCharge(m_CurrentWorld);
 
 		foreach(GameObject go in gos)
@@ -83,30 +102,7 @@ public class WorldControllerScript : MonoBehaviour
 	            }
 			}
 		}
-		/*
-        int childCount = m_World1.transform.GetChildCount();
-        for (int i = 0; i < childCount; i++)
-        {
-            Transform go = m_World1.transform.GetChild(i);
-            if (go.GetComponent<Renderer>() != null)
-            {
-                Color c = go.renderer.material.color;
-                c.a = m_CurrentWorld == 0 ? 1.0f : 0.3f;
-                go.renderer.material.color = c;
-            }
-        }
 
-        childCount = m_World2.transform.GetChildCount();
-        for (int i = 0; i < childCount; i++)
-        {
-            Transform go = m_World2.transform.GetChild(i);
-            if (go.GetComponent<Renderer>() != null)
-            {
-                Color c = go.renderer.material.color;
-                c.a = m_CurrentWorld != 0 ? 1.0f : 0.3f;
-                go.renderer.material.color = c;
-            }
-        }*/
 
         if (world == 0)
             m_ScreenEffet.Disable();

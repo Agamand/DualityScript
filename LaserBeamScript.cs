@@ -27,6 +27,7 @@ public class LaserBeamScript : MonoBehaviour {
         m_LineRenderers = new LineRenderer[m_LaserBeams.Length];
         for (int i = 0; i < m_LaserBeams.Length; i++)
             m_LineRenderers[i] = m_LaserBeams[i].GetComponent<LineRenderer>();
+        SetState(8);
 	}
 	
 	/*
@@ -44,7 +45,7 @@ public class LaserBeamScript : MonoBehaviour {
                 m_LineRenderers[i].renderer.enabled = false;
             }
 
-        }          
+        }
 	}
 
 }
