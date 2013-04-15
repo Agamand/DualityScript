@@ -56,18 +56,24 @@ public class HintPromptScript : MonoBehaviour {
 
     void OnTriggerEnter(Collider col)
     {
-        m_IsDisplaying = true;
-        m_Enabled = true;
-        foreach (GameObject hint in m_Hints)
+        if (PlayerPrefs.GetInt("DisplayHints") == 1)
         {
-            hint.renderer.enabled = true;
+            m_IsDisplaying = true;
+            m_Enabled = true;
+            foreach (GameObject hint in m_Hints)
+            {
+                hint.renderer.enabled = true;
+            }
         }
     }
 
     void OnTriggerExit(Collider col)
     {
-        m_IsDisplaying = false;
-        if (m_OnlyDisplayOnce)
-            gameObject.SetActive(false);
+        if (PlayerPrefs.GetInt("DisplayHints") == 1)
+        {
+            m_IsDisplaying = false;
+            if (m_OnlyDisplayOnce)
+                gameObject.SetActive(false);
+        }
     }
 }

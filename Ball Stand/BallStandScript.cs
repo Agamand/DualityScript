@@ -42,7 +42,7 @@ public class BallStandScript : MonoBehaviour {
      * */
     public void FlickOn()
     {
-		audio.PlayOneShot(m_SwitchOnSound);
+        audio.PlayOneShot(m_SwitchOnSound, PlayerPrefs.GetFloat("SoundVolume"));
         m_IsOn = true;
         foreach (Light l in m_Lights)
                 l.color = Color.green;
@@ -55,7 +55,7 @@ public class BallStandScript : MonoBehaviour {
      * */
     public void  FlickOff()
     {
-		audio.PlayOneShot(m_SwitchOffSound);
+        audio.PlayOneShot(m_SwitchOffSound, PlayerPrefs.GetFloat("SoundVolume"));
         m_IsOn = false;
         foreach (Light l in m_Lights)
             l.color = Color.red;

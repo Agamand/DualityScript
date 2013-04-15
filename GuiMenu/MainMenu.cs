@@ -9,14 +9,14 @@ public class MainMenu : MonoBehaviour {
 
     private MainMenuSelected menu;
     private SubMenuSelected submenu;
-    private int ratio = 0;
-    private int resolution = 0;
+    private int m_ratio = 0;
+    private int m_resolution = 0;
     private int quality = 0;
     private float m_fov = 90.0f;
     private float m_music_volume = 10.0f;
     private float m_sound_effects_volume = 10.0f;
     private bool m_fullscreen = false;
-    private bool m_score_show = true;
+    private bool m_display_score = true;
     private bool m_display_crosshair = true;
     private bool m_display_hints = true;
 
@@ -71,11 +71,7 @@ public class MainMenu : MonoBehaviour {
     private ComboBox comboBoxResolution = new ComboBox();
     private ComboBox comboBoxQuality = new ComboBox();
 
-    public Texture level1_image;
-    public Texture lock_image1;
-    public Texture lock_image2;
-    public Texture lock_image3;
-    public Texture lock_image4;
+    public Texture[] level_images;
 
     enum MainMenuSelected
     {
@@ -96,6 +92,7 @@ public class MainMenu : MonoBehaviour {
 
     void Start()
     {
+        Screen.showCursor = true;
         ratio_combobox = new GUIContent[3];
         m_keybindings = new String[m_keybindings_labels.Length];
         for (int i = 0; i < m_keybindings.Length; i++)
@@ -120,25 +117,140 @@ public class MainMenu : MonoBehaviour {
             m_quality[i] = new GUIContent(quality_string[i]);
 
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
+        InitializePlayerPrefs();
+    }
+
+    void InitializePlayerPrefs()
+    {
+        if (!PlayerPrefs.HasKey("MaxLevelReached"))
+            PlayerPrefs.SetInt("MaxLevelReached", 1);
+
+        if (!PlayerPrefs.HasKey("ElapsedTime"))
+            PlayerPrefs.SetFloat("ElapsedTime", 0);
+
+        if (!PlayerPrefs.HasKey("DeathCount"))
+            PlayerPrefs.SetInt("DeathCount", 0);
+
+        if (!PlayerPrefs.HasKey("MusicVolume"))
+            PlayerPrefs.SetFloat("MusicVolume", 7);
+
+        if (!PlayerPrefs.HasKey("SoundVolume"))
+            PlayerPrefs.SetFloat("SoundVolume", 5);
+
+        if (!PlayerPrefs.HasKey("AspectRatio"))//Récupérer aspect ratio du launcher
+            PlayerPrefs.SetInt("AspectRatio", 0);
+
+        if (!PlayerPrefs.HasKey("Resolution"))// Récupérer réso du launcher
+            PlayerPrefs.SetInt("Resolution", 0);
+
+        if (!PlayerPrefs.HasKey("QualityLevel"))//Récupérer qualité du launcher
+            PlayerPrefs.SetInt("QualityLevel", 3);
+
+        if (!PlayerPrefs.HasKey("Fullscreen"))
+            PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
+        
+        if (!PlayerPrefs.HasKey("DisplayScore")) //NOT IMPLEMENTED
+            PlayerPrefs.SetInt("DisplayScore", 1);
+
+        if (!PlayerPrefs.HasKey("DisplayCrosshair")) //NOT IMPLEMENTED
+            PlayerPrefs.SetInt("DisplayCrosshair", 1);
+
+        if (!PlayerPrefs.HasKey("DisplayHints"))
+            PlayerPrefs.SetInt("DisplayHints", 1);
+
+        if (!PlayerPrefs.HasKey("FOV"))
+            PlayerPrefs.SetFloat("FOV", 90);
+
+        if (!PlayerPrefs.HasKey("MenuKey"))
+        {
+           /* if (Application.isWebPlayer)
+                PlayerPrefs.SetInt("MenuKey", KeyCode.F1);
+            else
+                PlayerPrefs.SetInt("MenuKey", KeyCode.Escape);*/
+        }
+
+        PlayerPrefs.Save();
+    }
+
+    void LoadFromPlayerPrefs(String st="")
+    {
+        if (st.Equals(""))
+        {
+            m_display_crosshair = PlayerPrefs.GetInt("DisplayCrosshair") == 1 ? true : false;
+            m_display_hints = PlayerPrefs.GetInt("DisplayHints") == 1 ? true : false;
+            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
+            m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
+            m_fov = PlayerPrefs.GetFloat("FOV");
+            m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
+            m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
+
+
+        }
+        else if (st.Equals("video"))
+        {
+            m_display_crosshair = PlayerPrefs.GetInt("DisplayCrosshair") == 1 ? true : false;
+            m_display_hints = PlayerPrefs.GetInt("DisplayHints") == 1 ? true : false;
+            m_fov = PlayerPrefs.GetFloat("FOV");
+            m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
+            m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
+            m_ratio = PlayerPrefs.GetInt("AspectRatio");
+
+        }
+        else if (st.Equals("sound"))
+        {
+            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
+            m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
+        }
+
+    }
+
+    void SetPlayerPrefs(String st = "")
+    {
+        if (st.Equals(""))
+        {
+            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair? 1 : 0);
+            PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
+            PlayerPrefs.SetFloat("FOV", m_fov);
+            PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
+            PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
+            PlayerPrefs.SetInt("AspectRatio", m_ratio);
+            PlayerPrefs.SetFloat("SoundVolume", m_sound_effects_volume / 10);
+            PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
+        }
+        else if (st.Equals("video"))
+        {
+            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
+            PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
+            PlayerPrefs.SetFloat("FOV", m_fov);
+            PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
+            PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
+            PlayerPrefs.SetInt("AspectRatio", m_ratio);
+            Screen.fullScreen = m_fullscreen;
+
+        }
+        else if (st.Equals("sound"))
+        {
+            PlayerPrefs.SetFloat("SoundVolume", m_sound_effects_volume / 10);
+            PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
+        }
+
+        PlayerPrefs.Save();
     }
 
     void OnGUI()
     {
-        
-
-
-        
         //Stopwatch time = new Stopwatch();
         //time.Start();
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "New game", skin.button))
         {
-            //
+            print("Lancement nouvelle partie");
+            Application.LoadLevel("level_one");
         }
 
         if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Continue", skin.button))
         {
-            //
+            SaveManager.LoadLastSave();
         }
 
         if (GUI.Button(ResizeGUI(new Rect(20, 250, 100, 30)), "Levels", skin.button))
@@ -177,9 +289,12 @@ public class MainMenu : MonoBehaviour {
                 submenu = SubMenuSelected.NO_SELECTED;
             }
         }
-        if (GUI.Button(ResizeGUI(new Rect(20, 400, 100, 30)), "Quit", skin.button))
+        if (!Application.isWebPlayer)
         {
-            //
+            if (GUI.Button(ResizeGUI(new Rect(20, 400, 100, 30)), "Quit", skin.button))
+            {
+                Application.Quit();
+            }
         }
 
         
@@ -216,8 +331,13 @@ public class MainMenu : MonoBehaviour {
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Level selection", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(260, 120, 500, 400)));
 
-            GUI.Button(ResizeGUI(new Rect(20, 10, 70*3, 70*3),true), level1_image);
-
+            int max_reached = PlayerPrefs.GetInt("MaxLevelReached");
+            int j=0;
+            for (int i = 0; i < max_reached; i++)
+            {
+                if (GUI.Button(ResizeGUI(new Rect((i*140)+(i+1)*20, 30 + j, 70 * 2, 70 * 2), true), "Level "+(i+1), skin.button))
+                    Application.LoadLevel(i + 1);
+            }
 
             GUI.EndGroup();
         }
@@ -230,37 +350,39 @@ public class MainMenu : MonoBehaviour {
         
 		if(submenu == SubMenuSelected.VIDEO_SELECTED)
 		{
+            LoadFromPlayerPrefs("video");
+
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(310, 180, 500, 600)));
 
             GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)),"Aspect Ratio",skin.label);
 
             int selGrid;
-            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[ratio].text, ratio_combobox, skin.customStyles[0])) != ratio)
+            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
             {
-                ratio = selGrid;
+                m_ratio = selGrid;
             }
 
             GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)),"Resolution",skin.label);
 
-            switch(ratio)
+            switch(m_ratio)
             {
                 case 0:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _4_3_combobox[resolution].text, _4_3_combobox, skin.customStyles[0])) != resolution)
+                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _4_3_combobox[m_resolution].text, _4_3_combobox, skin.customStyles[0])) != m_resolution)
                     {
-                        resolution = selGrid;
+                        m_resolution = selGrid;
                     }
                     break;
                 case 1:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_10_combobox[resolution].text, _16_10_combobox, skin.customStyles[0])) != resolution)
+                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_10_combobox[m_resolution].text, _16_10_combobox, skin.customStyles[0])) != m_resolution)
                     {
-                        resolution = selGrid;
+                        m_resolution = selGrid;
                     }
                     break;
                 case 2:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_9_combobox[resolution].text, _16_9_combobox, skin.customStyles[0])) != resolution)
+                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_9_combobox[m_resolution].text, _16_9_combobox, skin.customStyles[0])) != m_resolution)
                     {
-                        resolution = selGrid;
+                        m_resolution = selGrid;
                     }
                     break;
 			}
@@ -280,7 +402,7 @@ public class MainMenu : MonoBehaviour {
 
             GUI.Label(ResizeGUI(new Rect(200, 110, 100, 40)), "Score :");
 
-            m_score_show = GUI.Toggle(ResizeGUI(new Rect(290, 110, 100, 40)), m_score_show, m_score_show ? "Show" : "Hide");
+            m_display_score = GUI.Toggle(ResizeGUI(new Rect(290, 110, 100, 40)), m_display_score, m_display_score ? "Show" : "Hide");
 
 
             GUI.Label(ResizeGUI(new Rect(200, 160, 100, 40)), "Fullscreen :");
@@ -293,12 +415,15 @@ public class MainMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(200, 260, 100, 40)), "Hints and tutorials :", skin.label);
             m_display_hints = GUI.Toggle(ResizeGUI(new Rect(290, 260, 100, 40)), m_display_hints, m_display_hints == true ? "  Show" : "  Hide", skin.toggle);
 
-
             GUI.EndGroup();
+            SetPlayerPrefs("video");
+
 		}
         
         if (submenu == SubMenuSelected.SOUND_SELECTED)
         {
+            LoadFromPlayerPrefs("sound");
+
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Sound Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(260, 120, 500, 400)));
             GUI.Label(ResizeGUI(new Rect(50, 50, 200, 40)), "Music Volume", skin.label);
@@ -310,6 +435,8 @@ public class MainMenu : MonoBehaviour {
 
 
             GUI.EndGroup();
+
+            SetPlayerPrefs("sound");
         }
         if (submenu == SubMenuSelected.CONTROLS_SELECTED)
         {

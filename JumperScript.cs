@@ -113,7 +113,7 @@ public class JumperScript : MonoBehaviour {
 
         if (m_CollideCount == 0)
         {
-            audio.PlayOneShot(m_HittingObjectSound);
+            audio.PlayOneShot(m_HittingObjectSound, PlayerPrefs.GetFloat("SoundVolume"));
             Cooldown();
             m_JumpCharge = m_MaxJumpCharge;
         }

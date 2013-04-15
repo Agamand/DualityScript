@@ -75,6 +75,7 @@ public class ControllerScript : MonoBehaviour
     private const float m_AnimationTime = 1.0f;
     private bool m_IsInAnimation = false;
     private GameObject m_FlashLight = null;
+    private GameObject m_Camera;
 
 
     void Start()
@@ -91,6 +92,7 @@ public class ControllerScript : MonoBehaviour
         m_LocalGravityScript = gameObject.GetComponent<LocalGravityScript>();
         m_RespawnGravityDir = m_LocalGravityScript.GetStartDir();
         m_AttachToPlayer = GameObject.Find("Grabber").GetComponent<AttachToPlayerScript>();
+        m_Camera = transform.FindChild("Camera").gameObject;
         m_FlashLight = GameObject.Find("Light");
         ToggleFlashLight();
         Screen.lockCursor = true;
@@ -135,8 +137,8 @@ public class ControllerScript : MonoBehaviour
 
         m_Incl += inclInc;
 
-        transform.FindChild("Camera").Rotate(Vector3.right, inclInc);
-        transform.FindChild("Light").Rotate(Vector3.right, inclInc);
+        m_Camera.transform.Rotate(Vector3.right, inclInc);
+        m_FlashLight.transform.Rotate(Vector3.right, inclInc);
     }
 
     public void AddDataToLoad(GameObject[] gameObjects)
@@ -189,9 +191,12 @@ public class ControllerScript : MonoBehaviour
 
     void Update()
     {
-
+        m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
         UpdateMouse();
         transform.Rotate(Vector3.up, m_Rot_Y);
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+            Application.LoadLevel("menu_config_scene");
 
         if (Input.GetButton("Go Forward"))
             m_GoForward = true;
@@ -234,7 +239,7 @@ public class ControllerScript : MonoBehaviour
 
         if (Input.GetButtonDown("Switch World"))
         {
-            audio.PlayOneShot(m_SwitchWorldSound);
+            audio.PlayOneShot(m_SwitchWorldSound, PlayerPrefs.GetFloat("SoundVolume"));
             m_WorldHandler.SwitchWorld();
             //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
         }
@@ -243,7 +248,7 @@ public class ControllerScript : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && m_JumpHandler.CanJump())
         {
-            audio.PlayOneShot(m_JumpingSound);
+            audio.PlayOneShot(m_JumpingSound, PlayerPrefs.GetFloat("SoundVolume"));
             vforce += Vector3.up * m_Jump;
             m_JumpHandler.OnJump();
         }

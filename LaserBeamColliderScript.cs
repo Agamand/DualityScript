@@ -30,7 +30,7 @@ public class LaserBeamColliderScript : MonoBehaviour {
     {
         if (col.CompareTag("Player"))
         {
-            audio.PlayOneShot(m_LaserSound);
+            audio.PlayOneShot(m_LaserSound, PlayerPrefs.GetFloat("SoundVolume"));
             m_PlayerControler.RespawnPlayer();
         }
     }
