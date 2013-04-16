@@ -80,7 +80,6 @@ public class ControllerScript : MonoBehaviour
     private GameObject m_Camera;
     private PauseMenu m_PauseMenu;
 
-
     void Start()
     {
         m_Incl = 0.0f;
@@ -187,27 +186,15 @@ public class ControllerScript : MonoBehaviour
     {
         if (SaveManager.m_MustLoad)
             SaveManager.LoadLastSave();
+		
         if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
-        {
-            if (m_PauseMenu.enabled)
-            {
-                m_PauseMenu.enabled = false;
-                Screen.showCursor = false;
-                Screen.lockCursor = true;
-            }
-            else
-            {
-                m_PauseMenu.enabled = true;
-                Screen.showCursor = true;
-                Screen.lockCursor = false;
-            }
-        }
+			m_PauseMenu.Enable(!m_PauseMenu.enabled);
 
         m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
 
+
         if (!m_PauseMenu.enabled)
         {
-
             UpdateMouse();
             transform.Rotate(Vector3.up, m_Rot_Y);
 
@@ -273,18 +260,22 @@ public class ControllerScript : MonoBehaviour
             vforce = transform.rotation * vforce;
             rigidbody.AddForce(vforce);
 
-            UpdateAnimation();
+        
+			m_Time += Time.deltaTime;
         }
-        else
-            m_Time += Time.deltaTime;
+        UpdateAnimation();
+            
     }
 
     void FixedUpdate()
     {
+		if(m_PauseMenu.enabled)
+			return;
         float dTime = Time.deltaTime;
         float force = m_Speed;
         Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
-
+		
+		
         if (m_GoForward)
         {
             vforce += Vector3.forward;

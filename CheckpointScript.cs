@@ -72,7 +72,6 @@ public class CheckpointScript : MonoBehaviour {
         SaveSerializedData();
         m_Cs.AddDataToLoad(m_GameObjects);*/
         //gameObject.SetActive(false);
-        
 	}
 	
     void SaveSerializedData()

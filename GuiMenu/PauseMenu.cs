@@ -66,7 +66,8 @@ public class PauseMenu : MonoBehaviour {
 
     private String highScoresSt;
     private DataBaseHandling m_db_handler;
-
+	private ScreenEffectScript m_ScreenEffectMenu; 
+	
 
     enum MainMenuSelected
     {
@@ -87,6 +88,8 @@ public class PauseMenu : MonoBehaviour {
 
     void Start()
     {
+		m_ScreenEffectMenu = GameObject.Find("MenuEffectGlobalScript").GetComponent<ScreenEffectScript>();
+		m_ScreenEffectMenu.Disable();
         m_keybindings = new String[m_keybindings_labels.Length];
         ratio_combobox = new GUIContent[3];
         _4_3_combobox = new GUIContent[resolution_4_3.Length];
@@ -202,6 +205,17 @@ public class PauseMenu : MonoBehaviour {
 
         PlayerPrefs.Save();
     }
+	
+	public void Enable(bool active)
+	{
+		enabled = active;
+        Screen.showCursor = active;
+        Screen.lockCursor = !active;
+		if(active)
+			m_ScreenEffectMenu.Enable();
+		else
+			m_ScreenEffectMenu.Disable();
+	}
 
     void LoadFromPlayerPrefs(String st = "")
     {
@@ -395,9 +409,7 @@ public class PauseMenu : MonoBehaviour {
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         {
-            Screen.showCursor = false;
-            Screen.lockCursor = true;
-            this.enabled = false;
+			Enable(false);
         }
 
         if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Restart Level", skin.button))

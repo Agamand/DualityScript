@@ -16,14 +16,13 @@ public class ScreenEffectScript : MonoBehaviour {
 	void Start () 
     {
 
-        m_GameObject = this.gameObject;
+        m_GameObject = gameObject;
         m_Camera = m_GameObject.AddComponent<Camera>();
         m_Camera.orthographic = true;
         m_Camera.orthographicSize = 1.0f;
         m_Camera.clearFlags = CameraClearFlags.Nothing;
         m_Camera.backgroundColor = new Color(0.0f, 0.0f, 0.0f, 0.0f);
         m_Camera.cullingMask = (1 << 30);
-
         m_EffectRenderer = new GameObject("EffectRenderer");
         m_EffectRenderer.layer = 30;
         m_EffectRenderer.transform.parent = transform;
