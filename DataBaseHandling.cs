@@ -36,10 +36,10 @@ public class DataBaseHandling : MonoBehaviour{
 
         if (hs_post.error != null)
         {
-            Debug.Log("The high score couldn't have been uploaded :" + hs_post.error);
+            Debug.Log("Error uploading the high score :" + hs_post.error);
         }
         else
-            Debug.Log("php hash : " + hs_post.text);
+            Debug.Log(hs_post.text);
     }
 
     IEnumerator Connect(String username, String password)
@@ -104,7 +104,6 @@ public class DataBaseHandling : MonoBehaviour{
         else
         {
            highscoreString = hs_get.text;
-           print("success " + hs_get.text);
         }
     }
 

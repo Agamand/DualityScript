@@ -750,7 +750,7 @@ public class MainMenu : MonoBehaviour {
             //Key Bindings
             GUI.Box(ResizeGUI(new Rect(80, 30, 400, 250)), "", skin.box);
             m_keybindings_scrollPosition = GUI.BeginScrollView(ResizeGUI(new Rect(80, 30, 400, 250)), m_keybindings_scrollPosition, ResizeGUI(new Rect(0, 0, 200, 25 * (m_keybindings_labels.Length + 1))));
-            GUI.Label(ResizeGUI(new Rect(10, 0, 300, 40)), "You can click and type any letter from A to Z to assign it", skin.label);
+            GUI.Label(ResizeGUI(new Rect(10, 0, 400, 40)), "You can click and type any letter from A to Z to assign it", skin.label);
 
             int i;
             for (i = 0; i < m_keybindings_labels.Length; i++)
@@ -801,8 +801,7 @@ public class MainMenu : MonoBehaviour {
             
             if (GUI.Button(ResizeGUI(new Rect(360, 5, 100, 40)), "Register"))
             {
-               /* Application.OpenURL("http://www.flyingminutegames.com/registration/");*/
-                m_db_handler.UploadScore("close_enough23", ""+23, ""+5, ""+1250233);
+               Application.OpenURL("http://www.flyingminutegames.com/registration/");
             }
 
             GUI.Label(ResizeGUI(new Rect(220, 50, 100, 40)), "Username", skin.label);

@@ -614,7 +614,7 @@ public class PauseMenu : MonoBehaviour {
             //Key Bindings
             GUI.Box(ResizeGUI(new Rect(80, 30, 400, 250)), "", skin.box);
             m_keybindings_scrollPosition = GUI.BeginScrollView(ResizeGUI(new Rect(80, 30, 400, 250)), m_keybindings_scrollPosition, ResizeGUI(new Rect(0, 0, 200, 25 * (m_keybindings_labels.Length + 1))));
-            GUI.Label(ResizeGUI(new Rect(10, 0, 300, 40)), "You can click and type any letter from A to Z to assign it", skin.label);
+            GUI.Label(ResizeGUI(new Rect(10, 0, 400, 40)), "You can click and type any letter from A to Z to assign it", skin.label);
 
             int i;
             for (i = 0; i < m_keybindings_labels.Length; i++)
