@@ -99,7 +99,6 @@ public class ControllerScript : MonoBehaviour
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
         m_PauseMenu = gameObject.GetComponent<PauseMenu>();
-        m_PauseMenu.enabled = false;
     }
 
     /**

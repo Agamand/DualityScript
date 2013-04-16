@@ -116,6 +116,7 @@ public class PauseMenu : MonoBehaviour {
         LoadKeysFromPrefs();
         LoadFromPlayerPrefs("video");
         m_db_handler = gameObject.AddComponent<DataBaseHandling>();
+        this.enabled = false;
     }
 
     void InitializePlayerPrefs()
