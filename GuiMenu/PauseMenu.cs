@@ -1,23 +1,8 @@
-/**
- *  MainMenu
- *      --> The Script for the main menu : 
- *          - handles all player prefs for options preferences, account settings and score
- *          - allows to start or continue the game
- *          - allows to play an unlocked level
- *          - allows to see the top ten high scores
- *          - allows to change every option of the game
- *  
- *  Members: 
- *      
- *  Authors: Cyril Basset, Jean-Vincent Lamberti
- **/
-
 using UnityEngine;
 using System.Collections;
-using System.Diagnostics;
 using System;
 
-public class MainMenu : MonoBehaviour {
+public class PauseMenu : MonoBehaviour {
 
     public GUISkin skin;
 
@@ -33,9 +18,6 @@ public class MainMenu : MonoBehaviour {
     private bool m_display_score = true;
     private bool m_display_crosshair = true;
     private bool m_display_hints = true;
-    private bool display_connection_message = false;
-    private bool connection_in_progress = false;
-    private int display_warning_login = 0;
 
 
     private float m_mouse_sensitivity = 2.0f;
@@ -63,13 +45,11 @@ public class MainMenu : MonoBehaviour {
                                           };
 
     private static String[] m_keybindings;
-    private String username = "";
-    private String password = "";
-    private static String[] ratio_string = {"4/3","16/10","16/9"};
-    private static String[] resolution_4_3 = { "800x600","1024x768", "1152x864", "1280x600", "1280x720", "1280x768", "1280x800", "1360x768", "1366x768", "1440x900", "1600x900", "1680x1080", "1920x1080" };
+    private static String[] ratio_string = { "4/3", "16/10", "16/9" };
+    private static String[] resolution_4_3 = { "800x600", "1024x768", "1152x864", "1280x600", "1280x720", "1280x768", "1280x800", "1360x768", "1366x768", "1440x900", "1600x900", "1680x1080", "1920x1080" };
     private static String[] resolution_16_10 = { "1280x800", "1680x1080", "1920x1080" };
     private static String[] resolution_16_9 = { "1280x720", "1360x768", "1366x768", "1440x900", "1600x900", "1680x1080", "1920x1080" };
-    private static String[] quality_string = {"Fastest","Fast","Simple","Good","Beautiful","Fanstatic"};
+    private static String[] quality_string = { "Fastest", "Fast", "Simple", "Good", "Beautiful", "Fanstatic" };
     private GUIContent[] ratio_combobox;
 
     private GUIContent[] _4_3_combobox;
@@ -91,10 +71,8 @@ public class MainMenu : MonoBehaviour {
     enum MainMenuSelected
     {
         NO_SELECTED,
-        LEVEL_SELECTED,
         OPTION_SELECTED,
         SCORE_SELECTED,
-        NEW_GAME_SELECTED,
         CONTINUE_GAME_SELECTED
     }
     enum SubMenuSelected
@@ -102,16 +80,13 @@ public class MainMenu : MonoBehaviour {
         NO_SELECTED,
         VIDEO_SELECTED,
         SOUND_SELECTED,
-        CONTROLS_SELECTED,
-        ACCOUNT_SELECTED
+        CONTROLS_SELECTED
     }
 
 
 
     void Start()
     {
-        Screen.showCursor = true;
-        Screen.lockCursor = false;
         m_keybindings = new String[m_keybindings_labels.Length];
         ratio_combobox = new GUIContent[3];
         _4_3_combobox = new GUIContent[resolution_4_3.Length];
@@ -120,17 +95,17 @@ public class MainMenu : MonoBehaviour {
         m_quality = new GUIContent[quality_string.Length];
         menu = MainMenuSelected.NO_SELECTED;
         submenu = SubMenuSelected.NO_SELECTED;
-        for (int i = 0; i < ratio_string.Length; i++ )
+        for (int i = 0; i < ratio_string.Length; i++)
             ratio_combobox[i] = new GUIContent(ratio_string[i]);
 
-        for (int i = 0; i < resolution_4_3.Length; i++ )
+        for (int i = 0; i < resolution_4_3.Length; i++)
             _4_3_combobox[i] = new GUIContent(resolution_4_3[i]);
-        for (int i = 0; i < resolution_16_10.Length; i++ )
+        for (int i = 0; i < resolution_16_10.Length; i++)
             _16_10_combobox[i] = new GUIContent(resolution_16_10[i]);
-        for (int i = 0; i < resolution_16_9.Length; i++ )
+        for (int i = 0; i < resolution_16_9.Length; i++)
             _16_9_combobox[i] = new GUIContent(resolution_16_9[i]);
 
-        for(int i  = 0; i < quality_string.Length; i++)
+        for (int i = 0; i < quality_string.Length; i++)
             m_quality[i] = new GUIContent(quality_string[i]);
 
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
@@ -173,7 +148,7 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("Fullscreen", 0);
         else if (!PlayerPrefs.HasKey("Fullscreen"))
             PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
-        
+
         if (!PlayerPrefs.HasKey("DisplayScore")) //NOT IMPLEMENTED
             PlayerPrefs.SetInt("DisplayScore", 1);
 
@@ -197,45 +172,45 @@ public class MainMenu : MonoBehaviour {
         if (!PlayerPrefs.HasKey("JumpKey"))
             PlayerPrefs.SetInt("JumpKey", (int)KeyCode.Space);
 
-       if (!PlayerPrefs.HasKey("ForwardKey"))
+        if (!PlayerPrefs.HasKey("ForwardKey"))
             PlayerPrefs.SetInt("ForwardKey", (int)KeyCode.Z);
 
-       if (!PlayerPrefs.HasKey("BackwardKey"))
+        if (!PlayerPrefs.HasKey("BackwardKey"))
             PlayerPrefs.SetInt("BackwardKey", (int)KeyCode.S);
 
-       if (!PlayerPrefs.HasKey("StrafeLeftKey"))
+        if (!PlayerPrefs.HasKey("StrafeLeftKey"))
             PlayerPrefs.SetInt("StrafeLeftKey", (int)KeyCode.Q);
 
-       if (!PlayerPrefs.HasKey("StrafeRightKey"))
+        if (!PlayerPrefs.HasKey("StrafeRightKey"))
             PlayerPrefs.SetInt("StrafeRightKey", (int)KeyCode.D);
 
-       if (!PlayerPrefs.HasKey("SwitchWorldKey"))
+        if (!PlayerPrefs.HasKey("SwitchWorldKey"))
             PlayerPrefs.SetInt("SwitchWorldKey", (int)KeyCode.A);
 
-      if (!PlayerPrefs.HasKey("CarryObjectKey"))
+        if (!PlayerPrefs.HasKey("CarryObjectKey"))
             PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
 
-      if (!PlayerPrefs.HasKey("RespawnKey"))
+        if (!PlayerPrefs.HasKey("RespawnKey"))
             PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
 
-      if (!PlayerPrefs.HasKey("MouseSensitivity"))
-          PlayerPrefs.SetFloat("MouseSensitivity", 80);
+        if (!PlayerPrefs.HasKey("MouseSensitivity"))
+            PlayerPrefs.SetFloat("MouseSensitivity", 80);
 
-      if (!PlayerPrefs.HasKey("InvertedMouse"))
-          PlayerPrefs.SetInt("InvertedMouse", 1);
+        if (!PlayerPrefs.HasKey("InvertedMouse"))
+            PlayerPrefs.SetInt("InvertedMouse", 1);
 
 
         PlayerPrefs.Save();
     }
 
-    void LoadFromPlayerPrefs(String st="")
+    void LoadFromPlayerPrefs(String st = "")
     {
         if (st.Equals(""))
         {
             m_display_crosshair = PlayerPrefs.GetInt("DisplayCrosshair") == 1 ? true : false;
             m_display_hints = PlayerPrefs.GetInt("DisplayHints") == 1 ? true : false;
-            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
-            m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
+            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume") * 10;
+            m_music_volume = PlayerPrefs.GetFloat("MusicVolume") * 10;
             m_fov = PlayerPrefs.GetFloat("FOV");
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
@@ -254,8 +229,8 @@ public class MainMenu : MonoBehaviour {
         }
         else if (st.Equals("sound"))
         {
-            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
-            m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
+            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume") * 10;
+            m_music_volume = PlayerPrefs.GetFloat("MusicVolume") * 10;
         }
         else if (st.Equals("controls"))
         {
@@ -268,7 +243,7 @@ public class MainMenu : MonoBehaviour {
     {
         if (st.Equals(""))
         {
-            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair? 1 : 0);
+            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
             PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
@@ -344,45 +319,45 @@ public class MainMenu : MonoBehaviour {
     {
         switch (kc)
         {
-            case KeyCode.A : return "A";
-            case KeyCode.B : return "B";
-            case KeyCode.C : return "C";
-            case KeyCode.D : return "D";
-            case KeyCode.E : return "E";
-            case KeyCode.F : return "F";
-            case KeyCode.G : return "G";
-            case KeyCode.H : return "H";
-            case KeyCode.I : return "I";
-            case KeyCode.J : return "J";
-            case KeyCode.K : return "K";
-            case KeyCode.L : return "L";
-            case KeyCode.M : return "M";
-            case KeyCode.N : return "N";
-            case KeyCode.O : return "O";
-            case KeyCode.P : return "P";
-            case KeyCode.Q : return "Q";
-            case KeyCode.R : return "R";
-            case KeyCode.S : return "S";
-            case KeyCode.T : return "T";
-            case KeyCode.U : return "U";
-            case KeyCode.V : return "V";
-            case KeyCode.W : return "W";
-            case KeyCode.X : return "X";
-            case KeyCode.Y : return "Y";
-            case KeyCode.Z : return "Z";
+            case KeyCode.A: return "A";
+            case KeyCode.B: return "B";
+            case KeyCode.C: return "C";
+            case KeyCode.D: return "D";
+            case KeyCode.E: return "E";
+            case KeyCode.F: return "F";
+            case KeyCode.G: return "G";
+            case KeyCode.H: return "H";
+            case KeyCode.I: return "I";
+            case KeyCode.J: return "J";
+            case KeyCode.K: return "K";
+            case KeyCode.L: return "L";
+            case KeyCode.M: return "M";
+            case KeyCode.N: return "N";
+            case KeyCode.O: return "O";
+            case KeyCode.P: return "P";
+            case KeyCode.Q: return "Q";
+            case KeyCode.R: return "R";
+            case KeyCode.S: return "S";
+            case KeyCode.T: return "T";
+            case KeyCode.U: return "U";
+            case KeyCode.V: return "V";
+            case KeyCode.W: return "W";
+            case KeyCode.X: return "X";
+            case KeyCode.Y: return "Y";
+            case KeyCode.Z: return "Z";
         }
         return "nc";
     }
 
     void LoadKeysFromPrefs()
     {
-        m_keybindings[0] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("ForwardKey"));
-        m_keybindings[1] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("BackwardKey"));
-        m_keybindings[2] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey"));
-        m_keybindings[3] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeRightKey"));
-        m_keybindings[4] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey"));
-        m_keybindings[5] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("CarryObjectKey"));
-        m_keybindings[6] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("RespawnKey"));
+        m_keybindings[0] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("ForwardKey"));
+        m_keybindings[1] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("BackwardKey"));
+        m_keybindings[2] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey"));
+        m_keybindings[3] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("StrafeRightKey"));
+        m_keybindings[4] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey"));
+        m_keybindings[5] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("CarryObjectKey"));
+        m_keybindings[6] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("RespawnKey"));
     }
 
 
@@ -412,24 +387,6 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("RespawnKey", (int)kb);
     }
 
-    void LoadPlayerPrefsConnection()
-    {
-        if (PlayerPrefs.HasKey("IsLoggedIn"))
-        {
-            username = PlayerPrefs.GetString("Username");
-            password = PlayerPrefs.GetString("Password");
-        }
-    }
-    
-    void SetPlayerPrefsConnection()
-    {
-        PlayerPrefs.SetString("Username", username);
-        PlayerPrefs.SetString("Password", password);
-        PlayerPrefs.SetInt("IsLoggedIn", 1);
-
-        print("Player Prefs DEFINED TO " + username + " " + password + " " + PlayerPrefs.HasKey("IsLoggedIn"));
-    }
-
     public void StartNewGame()
     {
         PlayerPrefs.SetFloat("Score", 0);
@@ -451,68 +408,18 @@ public class MainMenu : MonoBehaviour {
         //Stopwatch time = new Stopwatch();
         //time.Start();
 
-        if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "New game", skin.button))
+        if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         {
-            if (menu != MainMenuSelected.NEW_GAME_SELECTED)
-            {
-                menu = MainMenuSelected.NEW_GAME_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-            else
-            {
-                menu = MainMenuSelected.NO_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
+            this.enabled = false;
+        }
 
-            if (!PlayerPrefs.HasKey("IsLoggedIn"))
-            {
-                display_warning_login = 1;
-            }
-            else
-                StartNewGame();
+        if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Restart Level", skin.button))
+        {
 
         }
 
-        if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Continue", skin.button))
+        if (GUI.Button(ResizeGUI(new Rect(20, 250, 100, 30)), "Options", skin.button))
         {
-            if (menu != MainMenuSelected.CONTINUE_GAME_SELECTED)
-            {
-                menu = MainMenuSelected.CONTINUE_GAME_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-            else
-            {
-                menu = MainMenuSelected.NO_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-
-            if (!PlayerPrefs.HasKey("IsLoggedIn"))
-            {
-                display_warning_login = 2;
-            }
-            else
-                ContinueGame();
-
-        }
-
-        if (GUI.Button(ResizeGUI(new Rect(20, 250, 100, 30)), "Levels", skin.button))
-        {
-            display_warning_login = 0;
-
-            if (menu != MainMenuSelected.LEVEL_SELECTED)
-            {
-                menu = MainMenuSelected.LEVEL_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-            else
-            {
-                menu = MainMenuSelected.NO_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-        }
-        if (GUI.Button(ResizeGUI(new Rect(20, 300, 100, 30)), "Options", skin.button))
-        {
-            display_warning_login = 0;
 
             if (menu != MainMenuSelected.OPTION_SELECTED)
                 menu = MainMenuSelected.OPTION_SELECTED;
@@ -522,9 +429,8 @@ public class MainMenu : MonoBehaviour {
                 submenu = SubMenuSelected.NO_SELECTED;
             }
         }
-        if (GUI.Button(ResizeGUI(new Rect(20, 350, 100, 30)), "High-Score", skin.button))
+        if (GUI.Button(ResizeGUI(new Rect(20, 300, 100, 30)), "High-Score", skin.button))
         {
-            display_warning_login = 0;
 
             m_db_handler.FetchScores();
 
@@ -539,6 +445,11 @@ public class MainMenu : MonoBehaviour {
                 submenu = SubMenuSelected.NO_SELECTED;
             }
         }
+
+        if (GUI.Button(ResizeGUI(new Rect(20, 350, 100, 30)), "Return to Main Menu", skin.button))
+        {
+        }
+
         if (!Application.isWebPlayer)
         {
             if (GUI.Button(ResizeGUI(new Rect(20, 400, 100, 30)), "Quit", skin.button))
@@ -547,62 +458,32 @@ public class MainMenu : MonoBehaviour {
             }
         }
 
-        
-        if(menu == MainMenuSelected.OPTION_SELECTED)
+
+        if (menu == MainMenuSelected.OPTION_SELECTED)
         {
-            display_warning_login = 0;
 
             if (GUI.Button(ResizeGUI(new Rect(140, 300, 100, 30)), "Video", skin.button))
             {
-	            if(submenu != SubMenuSelected.VIDEO_SELECTED)
-	                submenu = SubMenuSelected.VIDEO_SELECTED;
-	            else submenu = SubMenuSelected.NO_SELECTED;
+                if (submenu != SubMenuSelected.VIDEO_SELECTED)
+                    submenu = SubMenuSelected.VIDEO_SELECTED;
+                else submenu = SubMenuSelected.NO_SELECTED;
             }
             if (GUI.Button(ResizeGUI(new Rect(140, 350, 100, 30)), "Sound", skin.button))
             {
-	            if(submenu != SubMenuSelected.SOUND_SELECTED)
-	                submenu = SubMenuSelected.SOUND_SELECTED;
-	            else submenu = SubMenuSelected.NO_SELECTED;
+                if (submenu != SubMenuSelected.SOUND_SELECTED)
+                    submenu = SubMenuSelected.SOUND_SELECTED;
+                else submenu = SubMenuSelected.NO_SELECTED;
             }
             if (GUI.Button(ResizeGUI(new Rect(140, 400, 100, 30)), "Controls", skin.button))
             {
-	            if(submenu != SubMenuSelected.CONTROLS_SELECTED)
-	                submenu = SubMenuSelected.CONTROLS_SELECTED;
-	            else submenu = SubMenuSelected.NO_SELECTED;
-            }
-            if (GUI.Button(ResizeGUI(new Rect(140, 450, 100, 30)), "Account", skin.button))
-            {
-                display_connection_message = false;
-                connection_in_progress = false;
-                LoadPlayerPrefsConnection();
-
-	            if(submenu != SubMenuSelected.ACCOUNT_SELECTED)
-	                submenu = SubMenuSelected.ACCOUNT_SELECTED;
-	            else submenu = SubMenuSelected.NO_SELECTED;
+                if (submenu != SubMenuSelected.CONTROLS_SELECTED)
+                    submenu = SubMenuSelected.CONTROLS_SELECTED;
+                else submenu = SubMenuSelected.NO_SELECTED;
             }
         }
 
-        if (menu == MainMenuSelected.LEVEL_SELECTED)
-        {
-            display_warning_login = 0;
-
-            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Level selection", skin.box);
-            GUI.BeginGroup(ResizeGUI(new Rect(260, 120, 500, 400)));
-
-            int max_reached = PlayerPrefs.GetInt("MaxLevelReached");
-            int j=0;
-            for (int i = 0; i < max_reached; i++)
-            {
-                if (GUI.Button(ResizeGUI(new Rect((i*140)+(i+1)*20, 30 + j, 70 * 2, 70 * 2), true), "Level "+(i+1), skin.button))
-                    Application.LoadLevel(i + 1);
-            }
-
-            GUI.EndGroup();
-        }
-       
         if (menu == MainMenuSelected.SCORE_SELECTED)
         {
-            display_warning_login = 0;
 
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "High Scores", skin.box);
             String[] tab = m_db_handler.getScoresTab();
@@ -629,33 +510,15 @@ public class MainMenu : MonoBehaviour {
             }
         }
 
-        if (display_warning_login != 0)
+        if (submenu == SubMenuSelected.VIDEO_SELECTED)
         {
-            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 150)), "Warning, you are not logged in,", skin.box);
-            GUI.Label(ResizeGUI(new Rect(310, 140, 400, 400)), "you won't be able to upload your score unless you are logged, in Options / Account, during your whole playthrough. Do you wish to continue ?", skin.label);
-            if (GUI.Button(ResizeGUI(new Rect(380, 200, 100, 40)), "Continue"))
-            {
-                if (display_warning_login == 1)
-                    StartNewGame();
-                else if (display_warning_login == 2)
-                    ContinueGame();
-            }
-            if (GUI.Button(ResizeGUI(new Rect(520, 200, 100, 40)), "Cancel"))
-            {
-                display_warning_login = 0;
-            }
-
-        }
-
-		if(submenu == SubMenuSelected.VIDEO_SELECTED)
-		{
 
             LoadFromPlayerPrefs("video");
 
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(310, 180, 500, 600)));
 
-            GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)),"Aspect Ratio",skin.label);
+            GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)), "Aspect Ratio", skin.label);
 
             int selGrid;
             if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
@@ -663,9 +526,9 @@ public class MainMenu : MonoBehaviour {
                 m_ratio = selGrid;
             }
 
-            GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)),"Resolution",skin.label);
+            GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)), "Resolution", skin.label);
 
-            switch(m_ratio)
+            switch (m_ratio)
             {
                 case 0:
                     if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _4_3_combobox[m_resolution].text, _4_3_combobox, skin.customStyles[0])) != m_resolution)
@@ -685,7 +548,7 @@ public class MainMenu : MonoBehaviour {
                         m_resolution = selGrid;
                     }
                     break;
-			}
+            }
 
             GUI.Label(ResizeGUI(new Rect(50, 170, 100, 40)), "Quality", skin.label);
 
@@ -694,7 +557,7 @@ public class MainMenu : MonoBehaviour {
                 quality = selGrid;
             }
 
-            GUI.Label(ResizeGUI(new Rect(230, 30, 100, 40)),"Field of view",skin.label);
+            GUI.Label(ResizeGUI(new Rect(230, 30, 100, 40)), "Field of view", skin.label);
 
             m_fov = GUI.HorizontalSlider(ResizeGUI(new Rect(170, 65, 200, 30)), m_fov, 50.0f, 130.0f, skin.horizontalSlider, skin.horizontalSliderThumb);
 
@@ -718,8 +581,8 @@ public class MainMenu : MonoBehaviour {
             GUI.EndGroup();
             SetPlayerPrefs("video");
 
-		}
-        
+        }
+
         if (submenu == SubMenuSelected.SOUND_SELECTED)
         {
 
@@ -792,85 +655,18 @@ public class MainMenu : MonoBehaviour {
 
             SetPlayerPrefs("controls");
         }
-        if (submenu == SubMenuSelected.ACCOUNT_SELECTED)
-        {
-
-            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Account Settings", skin.box);
-            GUI.BeginGroup(ResizeGUI(new Rect(260, 150, 500, 600)));
-            GUI.Label(ResizeGUI(new Rect(10, 5, 340, 40)), "Don't have an account yet? Create one on our website by clicking on the register button", skin.label);
-            
-            if (GUI.Button(ResizeGUI(new Rect(360, 5, 100, 40)), "Register"))
-            {
-                Application.OpenURL("http://www.flyingminutegames.com/registration/");
-            }
-
-            GUI.Label(ResizeGUI(new Rect(220, 50, 100, 40)), "Username", skin.label);
-
-            username = GUI.TextField(ResizeGUI(new Rect(150, 80, 200, 40)), username);
-
-            GUI.Label(ResizeGUI(new Rect(220, 130, 100, 40)), "Password", skin.label);
-
-            password = GUI.PasswordField(ResizeGUI(new Rect(150, 160, 200, 40)), password, '*');
-
-            if (GUI.Button(ResizeGUI(new Rect(80, 260, 100, 40)), "Try"))
-            {
-                m_db_handler.TryConnection(username, password);
-                display_connection_message = true;
-            }
-            if (display_connection_message)
-                GUI.Label(ResizeGUI(new Rect(80, 220, 500, 40)), m_db_handler.GetConnectionMessage(), skin.label);
-
-            if (GUI.Button(ResizeGUI(new Rect(220, 260, 100, 40)), "Apply"))
-            {
-                m_db_handler.TryConnection(username, password);
-                display_connection_message = true;
-                connection_in_progress = true;
-            }
-
-            if (connection_in_progress)
-            {
-                if (m_db_handler.getValidPassword() != null && m_db_handler.getValidUsername() != null)
-                {
-                    if (m_db_handler.getValidUsername().Equals(username) && m_db_handler.getValidPassword().Equals(password))
-                    {
-                        SetPlayerPrefsConnection();
-                        LoadPlayerPrefsConnection();
-                        connection_in_progress = false;
-                    }
-                }
-            }
-
-            if (GUI.Button(ResizeGUI(new Rect(360, 260, 100, 40)), "Logout"))
-            {
-                connection_in_progress = false;
-                display_connection_message = false;
-                
-                if (PlayerPrefs.HasKey("IsLoggedIn"))
-                {
-                    PlayerPrefs.DeleteKey("IsLoggedIn");
-                    PlayerPrefs.DeleteKey("Username");
-                    PlayerPrefs.DeleteKey("Password");
-                    username = "";
-                    password = "";
-                }
-            }
-
-            GUI.EndGroup();
-        }
-
-
     }
 
     Rect ResizeGUI(Rect _rect, bool uniformScale = false)
     {
-		Vector2 scale = new Vector2(Screen.width/800.0f,Screen.height/600.0f);
-		if(uniformScale)
-			  scale = new Vector2(scale.x < scale.y ? scale.x : scale.y, scale.x < scale.y ? scale.x : scale.y);
-		float rectX = _rect.x * scale.x;
+        Vector2 scale = new Vector2(Screen.width / 800.0f, Screen.height / 600.0f);
+        if (uniformScale)
+            scale = new Vector2(scale.x < scale.y ? scale.x : scale.y, scale.x < scale.y ? scale.x : scale.y);
+        float rectX = _rect.x * scale.x;
         float rectY = _rect.y * scale.y;
         float rectWidth = _rect.width * scale.x;
         float rectHeight = _rect.height * scale.y;
-		return new Rect(rectX, rectY, rectWidth, rectHeight);
-		
+        return new Rect(rectX, rectY, rectWidth, rectHeight);
+
     }
 }

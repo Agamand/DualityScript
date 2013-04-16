@@ -9,7 +9,13 @@ public class DataBaseHandling : MonoBehaviour{
     private String secretKey = "dke4AR1zE.47_en"; // Edit this value and make sure it's the same as the one stored on the server
     public String addScoreURL = "http://www.flyingminutegames.com/wp-includes/add_high_score.php?";
     public String highscoreURL = "http://www.flyingminutegames.com/wp-includes/display_high_score.php";
-    public String highscoreString;
+    public String connectURL = "http://www.flyingminutegames.com/wp-includes/connect_user.php?";
+
+    private String highscoreString;
+    private String connectionMessage;
+    private bool connectionSuccessFull = false;
+    private String validUsername = null;
+    private String validPassword = null;
 
     IEnumerator PostScores(String username, float elapsedtime, int deathcount, int score)
     {
@@ -31,6 +37,50 @@ public class DataBaseHandling : MonoBehaviour{
         {
             Debug.Log("The high score couldn't have been uploaded :" + hs_post.error);
         }
+    }
+
+    IEnumerator Connect(String username, String password)
+    {
+        connectionMessage = "Connecting...";
+        connectionSuccessFull = false;
+
+        String connect_url = connectURL
+        + "username=" + WWW.EscapeURL(username)
+        + "&password=" + WWW.EscapeURL(password);
+
+        WWW co_post = new WWW(connect_url);
+        yield return co_post;
+
+        if (co_post.error != null)
+        {
+            Debug.Log("Could not connect user :" + co_post.error);
+        }
+        else
+        {
+            connectionMessage = co_post.text;
+            if (connectionMessage.Equals("Connection successfull"))
+            {
+                connectionSuccessFull = true;
+                validUsername = username;
+                validPassword = password;
+            }
+        }
+
+    }
+
+    public void TryConnection(String username, String password)
+    {
+        StartCoroutine(Connect(username, password));
+    }
+
+    public String GetConnectionMessage()
+    {
+        return connectionMessage;
+    }
+
+    public bool HasSuccessfullyConnect()
+    {
+        return connectionSuccessFull;
     }
  
     IEnumerator GetScores()
@@ -60,5 +110,15 @@ public class DataBaseHandling : MonoBehaviour{
     {
         String[] tab = highscoreString.Split('\\');
         return tab;
+    }
+
+    public String getValidUsername()
+    {
+        return validUsername;
+    }
+
+    public String getValidPassword()
+    {
+        return validPassword;
     }
 }
