@@ -66,9 +66,9 @@ public class MainMenu : MonoBehaviour {
     private String username = "";
     private String password = "";
     private static String[] ratio_string = {"4/3","16/10","16/9"};
-    private static String[] resolution_4_3 = { "800x600","1024x768", "1152x864", "1280x600", "1280x720", "1280x768", "1280x800", "1360x768", "1366x768", "1440x900", "1600x900", "1680x1080", "1920x1080" };
-    private static String[] resolution_16_10 = { "1280x800", "1680x1080", "1920x1080" };
-    private static String[] resolution_16_9 = { "1280x720", "1360x768", "1366x768", "1440x900", "1600x900", "1680x1080", "1920x1080" };
+    private static String[] resolution_4_3 = { "640x480", "800x600","1024x768", "1280x960", "1440x1080"};
+    private static String[] resolution_16_10 = { "1280x800", "1440x900", "1680x1050"};
+    private static String[] resolution_16_9 = { "1280x720", "1366x768", "1600x900", "1920x1080", "2560×1440"};
     private static String[] quality_string = {"Fastest","Fast","Simple","Good","Beautiful","Fanstatic"};
     private GUIContent[] ratio_combobox;
 
@@ -160,13 +160,13 @@ public class MainMenu : MonoBehaviour {
         if (!PlayerPrefs.HasKey("SoundVolume"))
             PlayerPrefs.SetFloat("SoundVolume", 5);
 
-        if (!PlayerPrefs.HasKey("AspectRatio"))//Récupérer aspect ratio du launcher
-            PlayerPrefs.SetInt("AspectRatio", 0);
+        if (!PlayerPrefs.HasKey("AspectRatio"))
+            PlayerPrefs.SetInt("AspectRatio", 3);
 
-        if (!PlayerPrefs.HasKey("Resolution"))// Récupérer réso du launcher
-            PlayerPrefs.SetInt("Resolution", 0);
+        if (!PlayerPrefs.HasKey("Resolution"))
+            PlayerPrefs.SetInt("Resolution", 1);
 
-        if (!PlayerPrefs.HasKey("QualityLevel"))//Récupérer qualité du launcher
+        if (!PlayerPrefs.HasKey("QualityLevel"))
             PlayerPrefs.SetInt("QualityLevel", 3);
 
         if (Application.isWebPlayer)
@@ -174,10 +174,10 @@ public class MainMenu : MonoBehaviour {
         else if (!PlayerPrefs.HasKey("Fullscreen"))
             PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
         
-        if (!PlayerPrefs.HasKey("DisplayScore")) //NOT IMPLEMENTED
+        if (!PlayerPrefs.HasKey("DisplayScore"))
             PlayerPrefs.SetInt("DisplayScore", 1);
 
-        if (!PlayerPrefs.HasKey("DisplayCrosshair")) //NOT IMPLEMENTED
+        if (!PlayerPrefs.HasKey("DisplayCrosshair"))
             PlayerPrefs.SetInt("DisplayCrosshair", 1);
 
         if (!PlayerPrefs.HasKey("DisplayHints"))
@@ -224,23 +224,47 @@ public class MainMenu : MonoBehaviour {
       if (!PlayerPrefs.HasKey("InvertedMouse"))
           PlayerPrefs.SetInt("InvertedMouse", 1);
 
+      if (!PlayerPrefs.HasKey("Ratio"))
+          PlayerPrefs.SetInt("Ratio", 2);
 
-        PlayerPrefs.Save();
+
+          PlayerPrefs.Save();
+    }
+
+    void LoadResolution()
+    {
+        m_ratio = PlayerPrefs.GetInt("AspectRatio");
+        m_resolution = PlayerPrefs.GetInt("Resolution");
+
+        String resSt;
+        if (m_ratio == 0)
+            resSt = resolution_4_3[m_resolution];
+        else if (m_ratio == 1)
+            resSt = resolution_16_10[m_resolution];
+        else
+            resSt = resolution_16_9[m_resolution];
+
+        String[] resTab = resSt.Split('x');
+
+        Screen.SetResolution(int.Parse(resTab[0]), int.Parse(resTab[1]), m_fullscreen);
+
     }
 
     void LoadFromPlayerPrefs(String st="")
     {
         if (st.Equals(""))
         {
+            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume") * 10;
+            m_music_volume = PlayerPrefs.GetFloat("MusicVolume") * 10;
+            m_mouse_sensitivity = PlayerPrefs.GetFloat("MouseSensitivity") / 10;
+            m_inverted_mouse = PlayerPrefs.GetInt("InvertedMouse") == 1 ? false : true;
             m_display_crosshair = PlayerPrefs.GetInt("DisplayCrosshair") == 1 ? true : false;
             m_display_hints = PlayerPrefs.GetInt("DisplayHints") == 1 ? true : false;
-            m_sound_effects_volume = PlayerPrefs.GetFloat("SoundVolume")*10;
-            m_music_volume = PlayerPrefs.GetFloat("MusicVolume")*10;
             m_fov = PlayerPrefs.GetFloat("FOV");
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
-
-
+            m_ratio = PlayerPrefs.GetInt("AspectRatio");
+            LoadResolution();
         }
         else if (st.Equals("video"))
         {
@@ -250,7 +274,9 @@ public class MainMenu : MonoBehaviour {
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
-
+            quality = PlayerPrefs.GetInt("QualityLevel");
+            QualitySettings.SetQualityLevel(quality);
+            LoadResolution();
         }
         else if (st.Equals("sound"))
         {
@@ -268,14 +294,17 @@ public class MainMenu : MonoBehaviour {
     {
         if (st.Equals(""))
         {
-            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair? 1 : 0);
+            PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
             PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
             PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
+            PlayerPrefs.SetInt("Resolution", m_resolution);
             PlayerPrefs.SetFloat("SoundVolume", m_sound_effects_volume / 10);
             PlayerPrefs.SetFloat("MusicVolume", m_music_volume / 10);
+            PlayerPrefs.SetFloat("MouseSensitivity", m_mouse_sensitivity * 10);
+            PlayerPrefs.SetInt("InvertedMouse", m_inverted_mouse ? -1 : 1);
 
         }
         else if (st.Equals("video"))
@@ -286,8 +315,9 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
             PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
-            Screen.fullScreen = m_fullscreen;
-
+            PlayerPrefs.SetInt("Resolution", m_resolution);
+            PlayerPrefs.SetInt("QualityLevel", quality);
+            
         }
         else if (st.Equals("sound"))
         {
@@ -801,7 +831,10 @@ public class MainMenu : MonoBehaviour {
             
             if (GUI.Button(ResizeGUI(new Rect(360, 5, 100, 40)), "Register"))
             {
-               Application.OpenURL("http://www.flyingminutegames.com/registration/");
+                if (Application.isWebPlayer)
+                    Application.ExternalEval("window.open('http://www.flyingminutegames.com/registration/','Registration')");
+                else
+                    Application.OpenURL("http://www.flyingminutegames.com/registration/");
             }
 
             GUI.Label(ResizeGUI(new Rect(220, 50, 100, 40)), "Username", skin.label);
