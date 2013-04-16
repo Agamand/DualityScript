@@ -387,21 +387,6 @@ public class PauseMenu : MonoBehaviour {
             PlayerPrefs.SetInt("RespawnKey", (int)kb);
     }
 
-    public void StartNewGame()
-    {
-        PlayerPrefs.SetFloat("Score", 0);
-        PlayerPrefs.SetFloat("ElapsedTime", 0);
-        PlayerPrefs.SetInt("DeathCount", 0);
-        print("Start new Game");
-        Application.LoadLevel("level_one");
-
-    }
-
-    public void ContinueGame()
-    {
-        print("Continue");
-        SaveManager.LoadLastSave();
-    }
 
     void OnGUI()
     {
@@ -410,12 +395,14 @@ public class PauseMenu : MonoBehaviour {
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         {
+            Screen.showCursor = false;
+            Screen.lockCursor = true;
             this.enabled = false;
         }
 
         if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Restart Level", skin.button))
         {
-
+            Application.LoadLevel(Application.loadedLevel);
         }
 
         if (GUI.Button(ResizeGUI(new Rect(20, 250, 100, 30)), "Options", skin.button))
@@ -448,6 +435,7 @@ public class PauseMenu : MonoBehaviour {
 
         if (GUI.Button(ResizeGUI(new Rect(20, 350, 100, 30)), "Return to Main Menu", skin.button))
         {
+            Application.LoadLevel(0);
         }
 
         if (!Application.isWebPlayer)

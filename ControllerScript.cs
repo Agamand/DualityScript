@@ -78,6 +78,7 @@ public class ControllerScript : MonoBehaviour
     private const float m_AnimationTime = 1.0f;
     private bool m_IsInAnimation = false;
     private GameObject m_Camera;
+    private PauseMenu m_PauseMenu;
 
 
     void Start()
@@ -98,6 +99,8 @@ public class ControllerScript : MonoBehaviour
         Screen.lockCursor = true;
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
+        m_PauseMenu = gameObject.GetComponent<PauseMenu>();
+        m_PauseMenu.enabled = false;
     }
 
     /**
@@ -182,81 +185,98 @@ public class ControllerScript : MonoBehaviour
 
     void Update()
     {
-		if(SaveManager.m_MustLoad)
-			SaveManager.LoadLastSave();
+        if (SaveManager.m_MustLoad)
+            SaveManager.LoadLastSave();
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
+        {
+            if (m_PauseMenu.enabled)
+            {
+                m_PauseMenu.enabled = false;
+                Screen.showCursor = false;
+                Screen.lockCursor = true;
+            }
+            else
+            {
+                m_PauseMenu.enabled = true;
+                Screen.showCursor = true;
+                Screen.lockCursor = false;
+            }
+        }
 
         m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
-        UpdateMouse();
-        transform.Rotate(Vector3.up, m_Rot_Y);
 
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
-            Application.LoadLevel("menu_config_scene");
-
-        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("ForwardKey")))
-            m_GoForward = true;
-        else
-            m_GoForward = false;
-
-        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("BackwardKey")))
-            m_GoBackward = true;
-        else
-            m_GoBackward = false;
-
-        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeRightKey")))
-            m_GoRight = true;
-        else
-            m_GoRight = false;
-
-
-        if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey")))
-            m_GoLeft = true;
-        else
-            m_GoLeft = false;
-
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("RespawnKey")))
+        if (!m_PauseMenu.enabled)
         {
-            RespawnPlayer();
-        }
 
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("CarryObjectKey")))
-        {
-            if (m_AttachToPlayer.IsGrabbing())
-                m_AttachToPlayer.Release();
+            UpdateMouse();
+            transform.Rotate(Vector3.up, m_Rot_Y);
+
+            if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("ForwardKey")))
+                m_GoForward = true;
             else
-                m_AttachToPlayer.Grab();
+                m_GoForward = false;
+
+            if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("BackwardKey")))
+                m_GoBackward = true;
+            else
+                m_GoBackward = false;
+
+            if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeRightKey")))
+                m_GoRight = true;
+            else
+                m_GoRight = false;
+
+
+            if (Input.GetKey((KeyCode)PlayerPrefs.GetInt("StrafeLeftKey")))
+                m_GoLeft = true;
+            else
+                m_GoLeft = false;
+
+            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("RespawnKey")))
+            {
+                RespawnPlayer();
+            }
+
+            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("CarryObjectKey")))
+            {
+                if (m_AttachToPlayer.IsGrabbing())
+                    m_AttachToPlayer.Release();
+                else
+                    m_AttachToPlayer.Grab();
+            }
+
+            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey")))
+            {
+                audio.PlayOneShot(m_SwitchWorldSound, PlayerPrefs.GetFloat("SoundVolume"));
+                m_WorldHandler.SwitchWorld();
+                //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
+            }
+
+            if (Input.GetKeyDown(KeyCode.F5))
+                SaveManager.SaveToDisk();
+
+            if (Input.GetKeyDown(KeyCode.F9))
+            {
+                SaveManager.LoadFromDisk();
+                SaveManager.LoadLastSave();
+            }
+
+            Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
+
+            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("JumpKey")) && m_JumpHandler.CanJump())
+            {
+                audio.PlayOneShot(m_JumpingSound, PlayerPrefs.GetFloat("SoundVolume"));
+                vforce += Vector3.up * m_Jump;
+                m_JumpHandler.OnJump();
+            }
+
+            vforce = transform.rotation * vforce;
+            rigidbody.AddForce(vforce);
+
+            UpdateAnimation();
         }
-
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey")))
-        {
-            audio.PlayOneShot(m_SwitchWorldSound, PlayerPrefs.GetFloat("SoundVolume"));
-            m_WorldHandler.SwitchWorld();
-            //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
-        }
-		
-		if(Input.GetKeyDown(KeyCode.F5))
-			SaveManager.SaveToDisk();
-		
-		if(Input.GetKeyDown(KeyCode.F9))
-		{
-			SaveManager.LoadFromDisk();
-			SaveManager.LoadLastSave();
-		}
-		
-        Vector3 vforce = new Vector3(0.0f, 0.0f, 0.0f);
-
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("JumpKey")) && m_JumpHandler.CanJump())
-        {
-            audio.PlayOneShot(m_JumpingSound, PlayerPrefs.GetFloat("SoundVolume"));
-            vforce += Vector3.up * m_Jump;
-            m_JumpHandler.OnJump();
-        }
-		if(!m_InPause)
-			m_Time += Time.deltaTime;
-
-        vforce = transform.rotation * vforce;
-        rigidbody.AddForce(vforce);
-
-        UpdateAnimation();
+        else
+            m_Time += Time.deltaTime;
     }
 
     void FixedUpdate()
