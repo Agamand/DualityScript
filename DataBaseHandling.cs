@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Security.Cryptography;
 using System;
+using System.Text;
 
 public class DataBaseHandling : MonoBehaviour{
 
@@ -17,11 +18,13 @@ public class DataBaseHandling : MonoBehaviour{
     private String validUsername = null;
     private String validPassword = null;
 
-    IEnumerator PostScores(String username, float elapsedtime, int deathcount, int score)
+    IEnumerator PostScores(String username, String elapsedtime, String deathcount, String score)
     {
         //This connects to a server side php script that will add the name and score to a MySQL DB.
         // Supply it with a string representing the players name and the players score.
-        String hash = MD5.Create(username + score + secretKey).ToString();
+        String hash = CalculateMD5Hash(username + score + secretKey);
+
+        print(" Hash C# " + hash);
 
         String post_url = addScoreURL 
 		+ "username=" + WWW.EscapeURL(username) 
@@ -37,6 +40,8 @@ public class DataBaseHandling : MonoBehaviour{
         {
             Debug.Log("The high score couldn't have been uploaded :" + hs_post.error);
         }
+        else
+            Debug.Log("php hash : " + hs_post.text);
     }
 
     IEnumerator Connect(String username, String password)
@@ -66,6 +71,11 @@ public class DataBaseHandling : MonoBehaviour{
             }
         }
 
+    }
+
+    public void UploadScore(String username, String elapsedtime, String deathcount, String score)
+    {
+        StartCoroutine(PostScores(username, elapsedtime, deathcount, score));
     }
 
     public void TryConnection(String username, String password)
@@ -121,4 +131,12 @@ public class DataBaseHandling : MonoBehaviour{
     {
         return validPassword;
     }
+
+    public string CalculateMD5Hash(string inputSt)
+    {
+        byte[] asciiBytes = ASCIIEncoding.ASCII.GetBytes(inputSt);
+        byte[] hashedBytes = MD5CryptoServiceProvider.Create().ComputeHash(asciiBytes);
+        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower(); 
+    }
+
 }

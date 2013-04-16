@@ -801,7 +801,8 @@ public class MainMenu : MonoBehaviour {
             
             if (GUI.Button(ResizeGUI(new Rect(360, 5, 100, 40)), "Register"))
             {
-                Application.OpenURL("http://www.flyingminutegames.com/registration/");
+               /* Application.OpenURL("http://www.flyingminutegames.com/registration/");*/
+                m_db_handler.UploadScore("dummy", ""+23, ""+5, ""+3842);
             }
 
             GUI.Label(ResizeGUI(new Rect(220, 50, 100, 40)), "Username", skin.label);
