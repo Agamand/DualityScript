@@ -57,6 +57,9 @@ public class ControllerScript : MonoBehaviour
     private bool m_GoRight;
     private bool m_GoJump;
 
+	private float m_Time = 0f;
+	private bool m_InPause = false;
+
 
     JumperScript m_JumpHandler = null;
     WorldControllerScript m_WorldHandler = null;
@@ -95,8 +98,6 @@ public class ControllerScript : MonoBehaviour
         Screen.lockCursor = true;
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
-		if(SaveManager.m_MustLoad)
-			SaveManager.LoadLastSave();
     }
 
     /**
@@ -181,6 +182,8 @@ public class ControllerScript : MonoBehaviour
 
     void Update()
     {
+		if(SaveManager.m_MustLoad)
+			SaveManager.LoadLastSave();
 
         m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
         UpdateMouse();
@@ -247,6 +250,8 @@ public class ControllerScript : MonoBehaviour
             vforce += Vector3.up * m_Jump;
             m_JumpHandler.OnJump();
         }
+		if(!m_InPause)
+			m_Time += Time.deltaTime;
 
         vforce = transform.rotation * vforce;
         rigidbody.AddForce(vforce);
@@ -296,26 +301,14 @@ public class ControllerScript : MonoBehaviour
      * */
     public void RespawnPlayer()
     {
-        SaveManager.LoadLastSave();
-        /*transform.position = m_RespawnPosition;
-        //transform.rotation = m_RespawnRotation;
-        transform.rigidbody.velocity = m_InitialVelocity;
-        m_LocalGravityScript.setGravityDir(m_RespawnGravityDir);
-        if (m_WorldHandler.GetCurrentWorldNumber() != PlayerPrefs.GetInt("World"))
-            m_WorldHandler.SwitchWorld();
-
-        if (m_goToLoad != null)
-        {
-            foreach (GameObject go in m_goToLoad)
-            {
-                go.transform.position.Set(
-                                            PlayerPrefs.GetFloat(go.name + ".transform.position.x"),
-                                            PlayerPrefs.GetFloat(go.name + ".transform.position.y"),
-                                            PlayerPrefs.GetFloat(go.name + ".transform.position.z")
-                                          );
-            }
-        }
-        */
+		if (m_AttachToPlayer.IsGrabbing())
+			m_AttachToPlayer.Release();
+		SaveManager.LoadLastSave();
+		GameSave s = SaveManager.last_save;
+		s.deathCount++;
+		s.time += m_Time;
+		m_Time = 0;
+		SaveManager.SaveToDisk();
     }
 
     void OnTriggerEnter(Collider col)
@@ -337,7 +330,7 @@ public class ControllerScript : MonoBehaviour
     public void SetRespawnPosition(Vector3 newPosition)
     {
         SaveManager.SaveLastSave();
-        //m_RespawnPosition = newPosition;    
+        SaveManager.SaveToDisk();    
     }
 
     /**

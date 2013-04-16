@@ -45,7 +45,7 @@ public class CheckpointScript : MonoBehaviour {
             if (m_Activated)
             {
                 if (m_PlaySound)
-                    audio.PlayOneShot(m_CheckpointSound);
+                    audio.PlayOneShot(m_CheckpointSound, PlayerPrefs.GetFloat("SoundVolume"));
                 setRespawnIntel();
             }
         }
