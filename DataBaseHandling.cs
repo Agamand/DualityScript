@@ -20,17 +20,15 @@ public class DataBaseHandling : MonoBehaviour{
 
     IEnumerator PostScores(String username, String elapsedtime, String deathcount, String score)
     {
-        //This connects to a server side php script that will add the name and score to a MySQL DB.
-        // Supply it with a string representing the players name and the players score.
         String hash = CalculateMD5Hash(username + score + secretKey);
 
         print(" Hash C# " + hash);
 
         String post_url = addScoreURL 
-		+ "username=" + WWW.EscapeURL(username) 
-		+ "&score=" + score 
-		+ "&playtime=" + score 
-		+ "&deathcount=" + score 
+		+ "username=" + WWW.EscapeURL(username)
+        + "&score=" + WWW.EscapeURL(score)
+        + "&playtime=" + WWW.EscapeURL(elapsedtime)
+        + "&deathcount=" + WWW.EscapeURL(deathcount)  
 		+ "&hash=" + hash;
  
         WWW hs_post = new WWW(post_url);
@@ -136,7 +134,7 @@ public class DataBaseHandling : MonoBehaviour{
     {
         byte[] asciiBytes = ASCIIEncoding.ASCII.GetBytes(inputSt);
         byte[] hashedBytes = MD5CryptoServiceProvider.Create().ComputeHash(asciiBytes);
-        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower(); 
+        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();     
     }
 
 }
