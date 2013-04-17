@@ -162,7 +162,7 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetFloat("SoundVolume", 5);
 
         if (!PlayerPrefs.HasKey("AspectRatio"))
-            PlayerPrefs.SetInt("AspectRatio", 3);
+            PlayerPrefs.SetInt("AspectRatio", 2);
 
         if (!PlayerPrefs.HasKey("Resolution"))
             PlayerPrefs.SetInt("Resolution", 1);
@@ -225,10 +225,6 @@ public class MainMenu : MonoBehaviour {
       if (!PlayerPrefs.HasKey("InvertedMouse"))
           PlayerPrefs.SetInt("InvertedMouse", 1);
 
-      if (!PlayerPrefs.HasKey("Ratio"))
-          PlayerPrefs.SetInt("Ratio", 2);
-
-
           PlayerPrefs.Save();
     }
 
@@ -274,10 +270,11 @@ public class MainMenu : MonoBehaviour {
             m_fov = PlayerPrefs.GetFloat("FOV");
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
+            Screen.fullScreen = m_fullscreen;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
             quality = PlayerPrefs.GetInt("QualityLevel");
             QualitySettings.SetQualityLevel(quality);
-            LoadResolution();
+                LoadResolution();
         }
         else if (st.Equals("sound"))
         {
@@ -314,10 +311,11 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
             PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
+            PlayerPrefs.SetInt("QualityLevel", quality);
             PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
+
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
             PlayerPrefs.SetInt("Resolution", m_resolution);
-            PlayerPrefs.SetInt("QualityLevel", quality);
             
         }
         else if (st.Equals("sound"))
@@ -698,17 +696,17 @@ public class MainMenu : MonoBehaviour {
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(310, 180, 500, 600)));
 
-            GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)),"Aspect Ratio",skin.label);
-
             int selGrid;
+
+
             if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
             {
                 quality = selGrid;
             }
-			
-            GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)),"Resolution",skin.label);
 
-            switch(m_ratio)
+            GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)), "Resolution", skin.label);
+
+            switch (m_ratio)
             {
                 case 0:
                     if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _4_3_combobox[m_resolution].text, _4_3_combobox, skin.customStyles[0])) != m_resolution)
@@ -728,10 +726,10 @@ public class MainMenu : MonoBehaviour {
                         m_resolution = selGrid;
                     }
                     break;
-			}
+            }
 
             GUI.Label(ResizeGUI(new Rect(50, 170, 100, 40)), "Quality", skin.label);
-			
+
             if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
             {
                 m_ratio = selGrid;

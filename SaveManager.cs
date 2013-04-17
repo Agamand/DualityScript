@@ -347,8 +347,8 @@ public static class SaveManager
 	{
 		if(last_save == null && !PlayerPrefs.HasKey("Playthrough"))
 			return;
-		
-		if(Application.isWebPlayer)
+
+        if (Application.isWebPlayer)
 		{
 			var serializer = new XmlSerializer(typeof(GameSave));
 			String str = "";
@@ -368,14 +368,14 @@ public static class SaveManager
 	
 	public static bool CheckSaveFile()
 	{
-		if(Application.isWebPlayer)
+        if (Application.isWebPlayer)
 			return PlayerPrefs.HasKey("save");
 		return System.IO.File.Exists(m_FilePath);
 	}
 	
 	public static void DeleteSaveFile()
 	{
-		if(Application.isWebPlayer)
+        if (Application.isWebPlayer)
 			PlayerPrefs.DeleteKey("save");
 		System.IO.File.Delete(m_FilePath);
 	}
