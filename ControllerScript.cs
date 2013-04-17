@@ -1,5 +1,4 @@
 /**
-*    FIXEDUPDATE
  *  ControllerScript
  *      --> The script used as a Character Controller which handles : 
  *          - player movement (partial jump handling)
@@ -27,7 +26,7 @@
  *      private const float m_AnimationTime :
  *      private bool m_IsInAnimation : 
  *      
- *  Authors: Cyril Basset
+ *  Authors: Cyril Basset, Jean-Vincent Lamberti
  **/
 
 using UnityEngine;
@@ -123,7 +122,8 @@ public class ControllerScript : MonoBehaviour
     }
 
     /**
-     * ????????
+     * UpdateMouse()
+     *      Updates the mouse motion for Camera Handling
      * */
     private void UpdateMouse()
     {
@@ -146,6 +146,10 @@ public class ControllerScript : MonoBehaviour
         m_Camera.transform.Rotate(Vector3.right, (float)PlayerPrefs.GetInt("InvertedMouse")*inclInc);
     }
 
+    /**
+     * AddDataToLoad(GameObject[] gameObjects)
+     *      Adds each entries of the GameObject array given in parameters to the list of GameObjects to load
+     * */
     public void AddDataToLoad(GameObject[] gameObjects)
     {
         foreach (GameObject go in gameObjects)
@@ -170,7 +174,13 @@ public class ControllerScript : MonoBehaviour
 
 
     /**
-     * ???????????
+     * OnChangeGravity(Vector3 from, Vector3 to)
+     *    --> Create an animation for the gravity change of the player
+     *    
+     * Arguments: 
+     *      Vector3 from : the original vector
+     *      Vector3 to : the destination vector
+     *      
      * */
     public void OnChangeGravity(Vector3 from, Vector3 to)
     {
@@ -185,6 +195,11 @@ public class ControllerScript : MonoBehaviour
         m_IsInAnimation = true;
     }
 	
+    /**
+     * OnLevelReached()
+     *  --> Called when the player reaches the end of a level
+     * 
+     * */
 	public void OnLevelEndReach()
 	{
 		GameSave s = SaveManager.last_save;
@@ -208,6 +223,7 @@ public class ControllerScript : MonoBehaviour
 		m_EndMenu.Enable(true);
 	}
 	
+
     void Update()
     {
         if (SaveManager.m_MustLoad)
@@ -264,7 +280,6 @@ public class ControllerScript : MonoBehaviour
             {
                 audio.PlayOneShot(m_SwitchWorldSound, PlayerPrefs.GetFloat("SoundVolume"));
                 m_WorldHandler.SwitchWorld();
-                //m_JumpHandler.SetMaxCharge(m_WorldHandler.GetCurrentWorldNumber());
             }
 
             if (Input.GetKeyDown(KeyCode.F5))
@@ -298,6 +313,10 @@ public class ControllerScript : MonoBehaviour
             
     }
 
+    /*
+     *  FixedUpdate()
+     *      To use instead of Update() when adding a force continuously
+     * */
     void FixedUpdate()
     {
 		if(m_PauseMenu.enabled || m_EndMenu.enabled)
@@ -353,18 +372,9 @@ public class ControllerScript : MonoBehaviour
 		SaveManager.SaveToDisk();
     }
 
-    void OnTriggerEnter(Collider col)
-    {
-        /*if (m_AttachToPlayer.IsGrabbing() && (col.name.Equals("Grabber") || col == m_AttachToPlayer.GetGrabbed()))
-        {
-            m_AttachToPlayer.Release();
-        }*/
-    }
-
-
     /**
      *  SetRespawn()
-     *      --> sets the respawn of the player
+     *     --> Sets the respawn of the player
      *      
      * */
     public void SetRespawn()
@@ -374,7 +384,8 @@ public class ControllerScript : MonoBehaviour
     }
 
     /**
-     * ???????????
+     * UpdateAnimation()
+     *      -->
      * */
     private void UpdateAnimation()
     {
@@ -395,6 +406,13 @@ public class ControllerScript : MonoBehaviour
             m_IsInAnimation = false;
     }
 
+    /**
+     * CheckIfInsideObject(int layer)
+     *  -->Checks to see if the player is inside an object that will be materialize when he switches world
+     *  
+     * Arguments : 
+     *      int layer : the layer in which the player will be if he switches
+     * */
     public bool CheckIfInsideObject(int layer)
     {
         Vector3 p1 = transform.position + Vector3.up * -0.5f;
@@ -403,7 +421,6 @@ public class ControllerScript : MonoBehaviour
         foreach (Collider col in hitColliders)
             if (col.gameObject.layer == layer)
             {
-                print("Top end is inside " + col.name);
                 RespawnPlayer();
                 return false;
             }
@@ -412,7 +429,6 @@ public class ControllerScript : MonoBehaviour
         foreach (Collider col in hitColliders2)
             if (col.gameObject.layer == layer)
             {
-                print("Low end is inside " + col.name);
                 RespawnPlayer();
                 return false;
             }
@@ -420,6 +436,10 @@ public class ControllerScript : MonoBehaviour
         return true;
     }
 	
+    /*
+     * GetTime()
+     *  --> returns the current elapsed time
+     * */
 	public float GetTime()
 	{
 		return m_Time;

@@ -17,8 +17,6 @@ public class CheckpointScript : MonoBehaviour {
 
     public GameObject[] m_GameObjects;
     private ControllerScript m_Cs = null;
-    public Quaternion m_PlayerRotationOnSpawn;
-	public Vector3 m_PlayerGravityDirOnSpawn;
     public enum WorldIndexEnum { World1, World2 };
     public WorldIndexEnum m_WorldIndex = 0;
     public AudioClip m_CheckpointSound;
@@ -46,29 +44,43 @@ public class CheckpointScript : MonoBehaviour {
             {
                 if (m_PlaySound)
                     audio.PlayOneShot(m_CheckpointSound, PlayerPrefs.GetFloat("SoundVolume"));
-                setRespawnIntel();
+                SetRespawnIntel();
             }
         }
     }
 	
+    /**
+     *  GetActive()
+     *      -> returns wether or not the checkpoint is activated
+     * */
 	public bool GetActive()
 	{
 		return m_Activated;
 	}
 	
+    /**
+     * SetActive()
+     *  -> defines wether or not the checkpoint is activated
+     * 
+     * */
 	public void SetActive(bool active)
 	{
 		m_Activated = active;
 	}
 	
-	public void setRespawnIntel(){
+
+    /*
+     * SetRespawnIntel()
+     *  -> Sets the player respawn informations to this checkpoint
+     * 
+     * */
+	public void SetRespawnIntel(){
 		m_Activated = false;
         m_Cs.SetRespawn();
 	}
 	
     void SaveSerializedData()
     {
-        Debug.Log("Data saved");
         PlayerPrefs.SetInt("World", (int)m_WorldIndex);
         foreach (GameObject go in m_GameObjects)
         {

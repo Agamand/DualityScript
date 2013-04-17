@@ -442,7 +442,7 @@ public class PauseMenu : MonoBehaviour {
         {
 
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "High Scores", skin.box);
-            String[] tab = m_db_handler.getScoresTab();
+            String[] tab = m_db_handler.GetScoresTab();
 
             if (tab.Length == 0)
                 GUI.Box(ResizeGUI(new Rect(385, 200, 250, 200)), "Loading Scores", skin.box);

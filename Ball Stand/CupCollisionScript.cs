@@ -14,8 +14,8 @@ using System.Collections;
 public class CupCollisionScript : MonoBehaviour {
 
     private BallStandScript m_Bsc;
-	// Use this for initialization
-	void Start () {
+
+    void Start () {
         m_Bsc = gameObject.transform.parent.GetComponent<BallStandScript>();
 	}
 	

@@ -1,15 +1,14 @@
 /** 
 * LocalGravityScript
-*  --> change the gravity of ????
+*  --> change the gravity of gameObject the script is attached to
 *  
 * Members: 
-* - static float m_gravityAcceleration: ???????????
-* - public Vector3 m_StartDir: ?????????
-* - private Vector3 m_Gravity: ?????????
-* - private ConstantForce m_ConstForce: ?????????
-* - private GameObject m_GameObject: ???????
-* - private ControlerScript m_Player: ???????
-* - private Rigidbody m_Body: ????????
+* - static float m_gravityAcceleration: the gravity acceleration value
+* - public Vector3 m_StartDir: the starting direction 
+* - private Vector3 m_Gravity: the current gravity
+* - private ConstantForce m_ConstForce: the constante force applied to the gameObject
+* - private ControlerScript m_Player: the controller script attached to the gameObject
+* - private Rigidbody m_Body: the rigidbody of the gameObject
 *  
 * Authors: Cyril Basset
 * */
@@ -24,33 +23,35 @@ public class LocalGravityScript : MonoBehaviour {
 
     private Vector3 m_Gravity;
     private ConstantForce m_ConstForce = null;
-    private GameObject m_GameObject = null;
     private ControllerScript m_Player = null;
     private Rigidbody m_Body = null;
 
     void Start()
     {
-        m_GameObject = this.gameObject;
         m_Body = this.rigidbody;
 
         if (!m_Body)
         {
-            Debug.Log("Warning : LocalGravity is attach to a gameobject without rigidbody !");
             return;
         }
 
 
         m_Body.useGravity = false;
 
-        m_ConstForce = m_GameObject.AddComponent<ConstantForce>();
-        setGravityDir(m_StartDir);
+        m_ConstForce = gameObject.AddComponent<ConstantForce>();
+        SetGravityDir(m_StartDir);
         m_Player = GetComponent<ControllerScript>();
     }
 
     /**
-     * ???????????????????????
+     * SetGravityDir
+     *  -->Sets the Gravity direction and start the animation
+     * 
+     * Arguments:
+     *  - Vector3 newGravity: the new direction
+     *  - bool playerAnim: wether or not the change should be animated
      * */
-    public void setGravityDir(Vector3 newGravity, bool playerAnim = true)
+    public void SetGravityDir(Vector3 newGravity, bool playerAnim = true)
     {
         float mass = m_Body ? m_Body.mass : 1.0f;
 
@@ -73,6 +74,10 @@ public class LocalGravityScript : MonoBehaviour {
         return m_StartDir;
     }
 
+    /*
+     * GetGravity()
+     *  --> Returns the current gravity
+     * */
     public Vector3 GetGravity()
     {
         return m_Gravity;

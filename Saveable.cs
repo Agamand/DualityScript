@@ -46,7 +46,7 @@ public class Saveable : MonoBehaviour {
 		{
 			LocalGravityScript script = null;
 			if((script = GetComponent<LocalGravityScript>()) != null)
-				script.setGravityDir(save.m_Gravity.ToVector3(), false);
+				script.SetGravityDir(save.m_Gravity.ToVector3(), false);
 		}
 		
 		if(m_SaveEnable && gameObject.tag.Equals("Checkpoint"))

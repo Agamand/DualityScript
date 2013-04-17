@@ -8,7 +8,8 @@
  *  - private int m_CollideCount : the stack of colliders in contact with the gameObject collider
  *  - private int m_JumpCharge : the amount of jump charges the player has
  *  - private int m_MaxJumpCharge : the maximum amount of charges the player can have
- *  
+ *	- public AudioClip m_HittingObjectSound: the soundclip to play when the player hits the ground 
+ * 
  * Authors: Cyril Basset
  * */
 using UnityEngine;

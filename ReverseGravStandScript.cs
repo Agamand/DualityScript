@@ -23,6 +23,6 @@ public class ReverseGravStandScript : MonoBehaviour {
         if (gravityScript == null)
             return;
         audio.PlayOneShot(m_Sound, PlayerPrefs.GetFloat("SoundVolume"));
-        gravityScript.setGravityDir(m_Gravity);
+        gravityScript.SetGravityDir(m_Gravity);
     }
 }

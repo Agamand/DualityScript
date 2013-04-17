@@ -484,7 +484,7 @@ public class MainMenu : MonoBehaviour {
         //Stopwatch time = new Stopwatch();
         //time.Start();
 		
-		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
+		GUI.DrawTexture(new Rect(20f, 60f, 901*0.6f, 62*0.6f),logo);
 		
 		if(SaveManager.CheckSaveFile())
 		{
@@ -646,7 +646,7 @@ public class MainMenu : MonoBehaviour {
             display_warning_login = 0;
 
             GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "High Scores", skin.box);
-            String[] tab = m_db_handler.getScoresTab();
+            String[] tab = m_db_handler.GetScoresTab();
 
             if (tab.Length == 0)
                 GUI.Box(ResizeGUI(new Rect(385, 200, 250, 200)), "Loading Scores", skin.box);
@@ -873,9 +873,9 @@ public class MainMenu : MonoBehaviour {
 
             if (connection_in_progress)
             {
-                if (m_db_handler.getValidPassword() != null && m_db_handler.getValidUsername() != null)
+                if (m_db_handler.GetValidPassword() != null && m_db_handler.GetValidUsername() != null)
                 {
-                    if (m_db_handler.getValidUsername().Equals(username) && m_db_handler.getValidPassword().Equals(password))
+                    if (m_db_handler.GetValidUsername().Equals(username) && m_db_handler.GetValidPassword().Equals(password))
                     {
                         SetPlayerPrefsConnection();
                         LoadPlayerPrefsConnection();

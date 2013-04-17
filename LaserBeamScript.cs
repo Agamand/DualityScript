@@ -21,7 +21,6 @@ public class LaserBeamScript : MonoBehaviour {
     private LineRenderer []m_LineRenderers;
     private GameObject m_CurrentWorld;
 
-	// Use this for initialization
 	void Start () {
         m_LaserBeams = GameObject.FindGameObjectsWithTag("LaserBeam");
         m_LineRenderers = new LineRenderer[m_LaserBeams.Length];
@@ -31,7 +30,11 @@ public class LaserBeamScript : MonoBehaviour {
 	}
 	
 	/*
-     * Called when the player switches world
+     * SetState(int currentWorldLayer)
+     *  --> Called when the player switches world
+     *  
+     * Arguments:
+     *  - int curretnWordlLayer: the layer corresponding to the world the player is currently in
      * */
 	public void SetState (int currentWorldLayer) {
         for (int i = 0; i < m_LaserBeams.Length; i++)

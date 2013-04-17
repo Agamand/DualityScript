@@ -22,16 +22,10 @@ public class AttachableObjectScript : MonoBehaviour {
     private GameObject m_Grabber;
     public bool m_IsGrabbable = false;
 	
-    // Use this for initialization
-	void Start () {
+
+    void Start () {
 		m_OriginalTransform = gameObject.transform.parent;
 	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
-
 
     /**
      * GetOriginalTransform()
@@ -44,7 +38,7 @@ public class AttachableObjectScript : MonoBehaviour {
 
     /**
      * SetGrabber(GameObject grabber)
-     *  --> Defines the grabber actually carrying the object
+     *  --> Defines the grabber currently parenting the object
      *  
      * Arguments: 
      *  - GameObject grabber: the GameObject the grabbable object is attached to
@@ -53,8 +47,16 @@ public class AttachableObjectScript : MonoBehaviour {
     {
         m_Grabber = grabber;
     }
-	
-	public GameObject GetGrabber()
+
+
+    /**
+     * GetGrabber()
+     *  --> Return the grabber currently parenting the object
+     *  
+     * Arguments: 
+     *  - GameObject grabber: the GameObject the grabbable object is attached to
+     * */
+    public GameObject GetGrabber()
 	{
 		return m_Grabber;
 	}

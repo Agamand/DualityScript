@@ -15,7 +15,7 @@
 *  - public Material m_ClosedMaterial : the Material used for the DoorPane when the door is closed
 *  - public float m_Height = 3.5f : the height on which the door opens (allowing independant use of the script from the scale of the door)
 *  - private Vector3 m_RelPosition : a vector representing the relative position of the door, equivalent to the Transform.localPosition
- *                                      but allowing a generic use of the script independant from the axis of translations
+*                                      but allowing a generic use of the script independant from the axis of translations
 *    
 * Authors: Jean-Vincent Lamberti
 * */
@@ -51,15 +51,17 @@ public class DoorWithSwitchScript : MonoBehaviour {
             OpenDoor();
 	}
 	
-	// Update is called once per frame
     void Update()
     {
         if (m_IsChangingState)
             CheckSwitchesState();
     }
 
-    // Called  both when a switches changes its state and while the door is closing or opening
-	public void CheckSwitchesState () {
+    /**
+     * CheckSwitchState()
+     *  --> Called both when a switches changes its state and while the door is closing or opening
+     * */
+    public void CheckSwitchesState () {
         m_IsCleared = true;
         for (int i = 0; i < m_Switches.Length; i++)
         {

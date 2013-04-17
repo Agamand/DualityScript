@@ -4,6 +4,7 @@
  *  
  * Members: 
  * 	- private ControlerScript m_PlayerControler : the ControlerScript associated to the player
+ * 	- public AudioClip m_LaserSound : the soundclip to played when the player hits a laser
  *  
  * Authors: Jean-Vincent Lamberti
  * */
@@ -16,8 +17,7 @@ public class LaserBeamColliderScript : MonoBehaviour {
     public AudioClip m_LaserSound;
     private ControllerScript m_PlayerControler;
 
-        // Use this for initialization
-	void Start () {
+    void Start () {
         m_PlayerControler = GameObject.Find("Player").GetComponent<ControllerScript>();
 	}
 

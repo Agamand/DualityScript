@@ -1,3 +1,22 @@
+/**
+ *  DataBaseHandling
+ *      --> This script handles every call made to the server by executing different php scripts server side
+ *  
+ *  Members: 
+ *      private String secretKey: a static key used to check if any call of a script altering the content of the DB has been legitimately made by the game
+ *	    public String addScoreURL: the URL of the php script to add an high score
+ *      public String highscoreURL: the URL of the php script to display high scores
+ *	    public String connectURL: the URL of the php script to test wether or not the user is registered in the DB and has entered the valid password
+ *      
+ *      private String highscoreString: the String returned by the php script which contains either an error message or the top ten high score
+ *      private String connectionMessage: the String returned by the php connection script which states wheter or not the user is registered
+ *      private bool connectionSuccessFull: boolean allowing to know if the previous call to the connection script has been successfull
+ *      private String validUsername: the String containing the valid username when the user has connect successfully
+ *      private String validPassword: the String containing the valid password when the user has connect successfully
+ *      
+ *  Authors: Jean-Vincent Lamberti
+ **/
+
 using UnityEngine;
 using System.Collections;
 using System.Security.Cryptography;
@@ -18,6 +37,16 @@ public class DataBaseHandling : MonoBehaviour{
     private String validUsername = null;
     private String validPassword = null;
 
+    /**
+     * PostScores(String username, String elapsedtime, String deathcount, String score)
+     *  --> Coroutine used to upload a high score
+     *  
+     * Arguments: 
+     *  - String username : the username of the player
+     *  - String elapsedtime : the time the player has taken to beat the game
+     *  - String deathcount : the number of times the player died
+     *  - String score : the score of the player
+     * */
     IEnumerator PostScores(String username, String elapsedtime, String deathcount, String score)
     {
         String hash = CalculateMD5Hash(username + score + secretKey);
@@ -42,6 +71,14 @@ public class DataBaseHandling : MonoBehaviour{
             Debug.Log(hs_post.text);
     }
 
+    /**
+     * Connect(String username, String password)
+     *  --> Coroutine used to test whether or not the player has entered a valid user name and password
+     *  
+     * Arguments: 
+     *  - String username : the username of the player
+     *  - String elapsedtime : the password of the player
+     * */
     IEnumerator Connect(String username, String password)
     {
         connectionMessage = "Connecting...";
@@ -71,26 +108,45 @@ public class DataBaseHandling : MonoBehaviour{
 
     }
 
+    /**
+     * Starts the PostScores coroutine, call this to upload a new score
+     * */
     public void UploadScore(String username, String elapsedtime, String deathcount, String score)
     {
         StartCoroutine(PostScores(username, elapsedtime, deathcount, score));
     }
 
+    /**
+     * Starts the Connect coroutine, call this to test user account info
+     * */
     public void TryConnection(String username, String password)
     {
         StartCoroutine(Connect(username, password));
     }
 
+    /**
+     * GetConnectionMessage():
+     *  --> returns the string returned by the php connection script
+     * */
     public String GetConnectionMessage()
     {
         return connectionMessage;
     }
 
+    /**
+     * HasSuccessfullyConnect()
+     *  --> returns wether or not the player has entered valid account info
+     * */
     public bool HasSuccessfullyConnect()
     {
         return connectionSuccessFull;
     }
  
+    /**
+     * GetScores()
+     *  --> coroutine allowing to fetch the top ten high scores
+     * 
+     * */
     IEnumerator GetScores()
     {
         highscoreString = "Loading Scores";
@@ -107,29 +163,50 @@ public class DataBaseHandling : MonoBehaviour{
         }
     }
 
+    /**
+     * Calls the GetScores coroutine, call this to get the top ten high scores
+     * */
     public void FetchScores()
     {
         StartCoroutine(GetScores());
 
     }
 
-    public String[] getScoresTab()
+    /**
+     * GetScoresTab()
+     *  --> get a String array of the top ten high scores
+     * */
+    public String[] GetScoresTab()
     {
         String[] tab = highscoreString.Split('\\');
         return tab;
     }
 
-    public String getValidUsername()
+    /**
+     * GetValidUsername()
+     *  --> returns the username of the player if he has connected successfully
+     * 
+     * */
+    public String GetValidUsername()
     {
         return validUsername;
     }
 
-    public String getValidPassword()
+    /**
+     * GetValidPassword()
+     *  --> returns the password of the player if he has connected successfully
+     * 
+     * */
+    public String GetValidPassword()
     {
         return validPassword;
     }
 
-    public string CalculateMD5Hash(string inputSt)
+    /**
+     * CalculateMD5Hash(String inputs)
+     *  --> returns a md5 hashed String of the string given in parameters
+     * */
+    public String CalculateMD5Hash(String inputSt)
     {
         byte[] asciiBytes = ASCIIEncoding.ASCII.GetBytes(inputSt);
         byte[] hashedBytes = MD5CryptoServiceProvider.Create().ComputeHash(asciiBytes);

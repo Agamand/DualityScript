@@ -5,7 +5,10 @@
  * Members: 
  *  - private bool m_IsOn: whether or not the switch is on
  *  - private Light[] m_Lights: the lights of the switch
- *
+ *  - public DoorWithSwitchScript m_AssociatedDoor: the door to which the switches are assigned
+ *	- public AudioClip m_SwitchOnSound : the soundclip to play when the switches toggles on
+ * 	- public AudioClip m_SwitchOffSound : the soudclip to play when the switches toggles off
+ * 	
  *  Authors: Jean-Vincent Lamberti
  * */
 
@@ -15,12 +18,11 @@ using System.Collections;
 public class BallStandScript : MonoBehaviour {
 
     private bool m_IsOn = false;
-    public DoorWithSwitchScript m_AssociatedDoor;
     private Light[] m_Lights;
+    public DoorWithSwitchScript m_AssociatedDoor;
 	public AudioClip m_SwitchOnSound; 
 	public AudioClip m_SwitchOffSound;
 
-	// Use this for initialization
 	void Start () {
         m_Lights = new Light[2];
         m_Lights[0] = gameObject.transform.FindChild("leftLight").light;
