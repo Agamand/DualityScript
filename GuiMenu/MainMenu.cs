@@ -20,6 +20,7 @@ using System;
 public class MainMenu : MonoBehaviour {
 
     public GUISkin skin;
+	public Texture logo;
 
     private MainMenuSelected menu;
     private SubMenuSelected submenu;
@@ -465,7 +466,9 @@ public class MainMenu : MonoBehaviour {
         PlayerPrefs.SetFloat("Score", 0);
         PlayerPrefs.SetFloat("ElapsedTime", 0);
         PlayerPrefs.SetInt("DeathCount", 0);
+		PlayerPrefs.SetInt("Playthrough",1);
         print("Start new Game");
+		SaveManager.last_save = null;
         Application.LoadLevel("level_one");
 
     }
@@ -473,6 +476,8 @@ public class MainMenu : MonoBehaviour {
     public void ContinueGame()
     {
         print("Continue");
+		PlayerPrefs.SetInt("Playthrough",1);
+		SaveManager.LoadFromDisk();
         SaveManager.LoadLastSave();
     }
 
@@ -480,8 +485,34 @@ public class MainMenu : MonoBehaviour {
     {
         //Stopwatch time = new Stopwatch();
         //time.Start();
-
-        if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "New game", skin.button))
+		
+		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
+		
+		if(SaveManager.CheckSaveFile())
+		{
+        	if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
+        	{
+	            if (menu != MainMenuSelected.CONTINUE_GAME_SELECTED)
+	            {
+	                menu = MainMenuSelected.CONTINUE_GAME_SELECTED;
+	                submenu = SubMenuSelected.NO_SELECTED;
+	            }
+	            else
+	            {
+	                menu = MainMenuSelected.NO_SELECTED;
+	                submenu = SubMenuSelected.NO_SELECTED;
+	            }
+	
+	            if (!PlayerPrefs.HasKey("IsLoggedIn"))
+	            {
+	                display_warning_login = 2;
+	            }
+	            else
+	                ContinueGame();
+       	 	}
+		}
+		
+        if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "New game", skin.button))
         {
             if (menu != MainMenuSelected.NEW_GAME_SELECTED)
             {
@@ -500,28 +531,6 @@ public class MainMenu : MonoBehaviour {
             }
             else
                 StartNewGame();
-
-        }
-
-        if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Continue", skin.button))
-        {
-            if (menu != MainMenuSelected.CONTINUE_GAME_SELECTED)
-            {
-                menu = MainMenuSelected.CONTINUE_GAME_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-            else
-            {
-                menu = MainMenuSelected.NO_SELECTED;
-                submenu = SubMenuSelected.NO_SELECTED;
-            }
-
-            if (!PlayerPrefs.HasKey("IsLoggedIn"))
-            {
-                display_warning_login = 2;
-            }
-            else
-                ContinueGame();
 
         }
 
@@ -624,7 +633,11 @@ public class MainMenu : MonoBehaviour {
             for (int i = 0; i < max_reached; i++)
             {
                 if (GUI.Button(ResizeGUI(new Rect((i*140)+(i+1)*20, 30 + j, 70 * 2, 70 * 2), true), "Level "+(i+1), skin.button))
+				{
+					PlayerPrefs.DeleteKey("Playthrough");
+					SaveManager.last_save = null;
                     Application.LoadLevel(i + 1);
+				}
             }
 
             GUI.EndGroup();
@@ -688,11 +701,11 @@ public class MainMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)),"Aspect Ratio",skin.label);
 
             int selGrid;
-            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
+            if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
             {
-                m_ratio = selGrid;
+                quality = selGrid;
             }
-
+			
             GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)),"Resolution",skin.label);
 
             switch(m_ratio)
@@ -718,10 +731,10 @@ public class MainMenu : MonoBehaviour {
 			}
 
             GUI.Label(ResizeGUI(new Rect(50, 170, 100, 40)), "Quality", skin.label);
-
-            if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+			
+            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
             {
-                quality = selGrid;
+                m_ratio = selGrid;
             }
 
             GUI.Label(ResizeGUI(new Rect(230, 30, 100, 40)),"Field of view",skin.label);

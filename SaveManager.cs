@@ -225,7 +225,7 @@ public static class SaveManager
 
 	public static void LoadFromDisk()
 	{
-		if(true)
+		if(Application.isWebPlayer)
 		{
 			var serializer = new XmlSerializer(typeof(GameSave));
 		 	if(!PlayerPrefs.HasKey("save"))
@@ -234,6 +234,11 @@ public static class SaveManager
 			TextReader textReader = new StringReader(PlayerPrefs.GetString("save"));			
 			GameSave gamesave;
 		 	gamesave = (GameSave)serializer.Deserialize(textReader);
+			if(gamesave == null)
+			{
+				Debug.Log ("Warning : deserialization fail");
+				return;
+			}
 			last_save = gamesave;
 			
 		}
@@ -330,15 +335,20 @@ public static class SaveManager
 			gamesave.deathCount = last_save.deathCount;
 			gamesave.score = last_save.score;
 		}
+		if(gamesave == null)
+		{
+			Debug.Log ("Warning : save fail");
+			return;
+		}
 		last_save = gamesave;	
 	}
 	
 	public static void SaveToDisk()
 	{
-		if(last_save == null && PlayerPrefs.HasKey("playthrough") && PlayerPrefs.GetInt("playthrough") == 0)
+		if(last_save == null && !PlayerPrefs.HasKey("Playthrough"))
 			return;
 		
-		if(true)
+		if(Application.isWebPlayer)
 		{
 			var serializer = new XmlSerializer(typeof(GameSave));
 			String str = "";
@@ -358,8 +368,15 @@ public static class SaveManager
 	
 	public static bool CheckSaveFile()
 	{
-		if(true)
+		if(Application.isWebPlayer)
 			return PlayerPrefs.HasKey("save");
 		return System.IO.File.Exists(m_FilePath);
+	}
+	
+	public static void DeleteSaveFile()
+	{
+		if(Application.isWebPlayer)
+			PlayerPrefs.DeleteKey("save");
+		System.IO.File.Delete(m_FilePath);
 	}
 }

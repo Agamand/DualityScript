@@ -5,6 +5,7 @@ using System;
 public class PauseMenu : MonoBehaviour {
 
     public GUISkin skin;
+	public Texture logo;
 
     private MainMenuSelected menu;
     private SubMenuSelected submenu;
@@ -431,11 +432,14 @@ public class PauseMenu : MonoBehaviour {
         else
             m_ScreenEffectMenu.Disable();
     }
+	
 
     void OnGUI()
     {
         //Stopwatch time = new Stopwatch();
         //time.Start();
+		
+		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         {
@@ -444,6 +448,17 @@ public class PauseMenu : MonoBehaviour {
 
         if (GUI.Button(ResizeGUI(new Rect(20, 200, 100, 30)), "Restart Level", skin.button))
         {
+			
+			
+			GameSave s = SaveManager.last_save;
+			
+			if(s != null)
+			{
+				s.time += GetComponent<ControllerScript>().GetTime();
+				s.deathCount++;
+			}
+			SaveManager.SaveToDisk();
+			
             Application.LoadLevel(Application.loadedLevel);
         }
 
@@ -551,13 +566,14 @@ public class PauseMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)), "Aspect Ratio", skin.label);
 
             int selGrid;
-            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
-            {
-                m_ratio = selGrid;
-            }
 
             GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)), "Resolution", skin.label);
-
+			
+            if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+            {
+                quality = selGrid;
+            }
+			
             switch (m_ratio)
             {
                 case 0:
@@ -581,10 +597,10 @@ public class PauseMenu : MonoBehaviour {
             }
 
             GUI.Label(ResizeGUI(new Rect(50, 170, 100, 40)), "Quality", skin.label);
-
-            if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+			
+            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
             {
-                quality = selGrid;
+                m_ratio = selGrid;
             }
 
             GUI.Label(ResizeGUI(new Rect(230, 30, 100, 40)), "Field of view", skin.label);

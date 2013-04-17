@@ -27,7 +27,7 @@ public class CheckpointScript : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        m_Cs = GameObject.Find("Player").GetComponent<ControllerScript>();
+        m_Cs = GameObject.FindGameObjectWithTag("Player").GetComponent<ControllerScript>();
 	}
 	
 
@@ -63,15 +63,7 @@ public class CheckpointScript : MonoBehaviour {
 	
 	public void setRespawnIntel(){
 		m_Activated = false;
-        m_Cs.SetRespawnPosition(gameObject.transform.position);
-        /*Debug.Log("Entered in checkpoint, instantiated values are :");
-        foreach (GameObject go in m_GameObjects)
-        {
-            Debug.Log(go.name + " x:" + go.transform.position.x + " y:" + go.transform.position.y + " z:" + go.transform.position.z);
-        }
-        SaveSerializedData();
-        m_Cs.AddDataToLoad(m_GameObjects);*/
-        //gameObject.SetActive(false);
+        m_Cs.SetRespawn();
 	}
 	
     void SaveSerializedData()

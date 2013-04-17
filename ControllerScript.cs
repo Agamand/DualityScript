@@ -79,7 +79,9 @@ public class ControllerScript : MonoBehaviour
     private bool m_IsInAnimation = false;
     private GameObject m_Camera;
     private PauseMenu m_PauseMenu;
-
+	private EndMenu m_EndMenu;
+	private HudScript m_Hud;
+	
     void Start()
     {
         m_Incl = 0.0f;
@@ -99,6 +101,8 @@ public class ControllerScript : MonoBehaviour
         m_goToLoad = new ArrayList();
         m_PlayerCollider = gameObject.collider;
         m_PauseMenu = gameObject.GetComponent<PauseMenu>();
+		m_EndMenu = gameObject.GetComponent<EndMenu>();
+		m_Hud = GameObject.Find("HUD").GetComponent<HudScript>();
     }
 
     /**
@@ -180,19 +184,42 @@ public class ControllerScript : MonoBehaviour
 
         m_IsInAnimation = true;
     }
-
+	
+	public void OnLevelEndReach()
+	{
+		GameSave s = SaveManager.last_save;
+		s.time += m_Time;
+		s.m_Saves.Clear();
+		s.level++;
+		s.score = 150000 - (int)s.time*50 - s.deathCount*1000;
+		if(s.score < 0)
+			s.score = 0;
+		
+		m_Time = 0;
+		SaveManager.SaveToDisk();
+		
+		if(Application.loadedLevel == Application.levelCount-1)
+			SaveManager.DeleteSaveFile();
+		
+		if(PlayerPrefs.HasKey("MaxLevelReached") && PlayerPrefs.GetInt("MaxLevelReached") < Application.loadedLevel + 1)
+			PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
+		else if(!PlayerPrefs.HasKey("MaxLevelReached"))
+			PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
+		m_EndMenu.Enable(true);
+	}
+	
     void Update()
     {
         if (SaveManager.m_MustLoad)
             SaveManager.LoadLastSave();
 		
-        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")))
+        if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("MenuKey")) && !m_EndMenu.enabled)
 			m_PauseMenu.Enable(!m_PauseMenu.enabled);
 
         m_Camera.camera.fieldOfView = PlayerPrefs.GetFloat("FOV");
 
 
-        if (!m_PauseMenu.enabled)
+        if (!m_PauseMenu.enabled && !m_EndMenu.enabled)
         {
             UpdateMouse();
             transform.Rotate(Vector3.up, m_Rot_Y);
@@ -218,10 +245,7 @@ public class ControllerScript : MonoBehaviour
             else
                 m_GoLeft = false;
 
-            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("RespawnKey")))
-            {
-                RespawnPlayer();
-            }
+
 
             if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("CarryObjectKey")))
             {
@@ -229,6 +253,11 @@ public class ControllerScript : MonoBehaviour
                     m_AttachToPlayer.Release();
                 else
                     m_AttachToPlayer.Grab();
+            }
+
+            if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("RespawnKey")))
+            {
+                RespawnPlayer();
             }
 
             if (Input.GetKeyDown((KeyCode)PlayerPrefs.GetInt("SwitchWorldKey")))
@@ -261,6 +290,9 @@ public class ControllerScript : MonoBehaviour
 
         
 			m_Time += Time.deltaTime;
+			GameSave s;
+			if((s = SaveManager.last_save) != null)
+				m_Hud.SetScore(150000 - (int)((s.time + m_Time)*50) - s.deathCount*1000);
         }
         UpdateAnimation();
             
@@ -268,7 +300,7 @@ public class ControllerScript : MonoBehaviour
 
     void FixedUpdate()
     {
-		if(m_PauseMenu.enabled)
+		if(m_PauseMenu.enabled || m_EndMenu.enabled)
 			return;
         float dTime = Time.deltaTime;
         float force = m_Speed;
@@ -331,36 +363,15 @@ public class ControllerScript : MonoBehaviour
 
 
     /**
-     *  SetRespawnPosition(Vector3 new_Position)
-     *      --> sets the respawn position of the player
+     *  SetRespawn()
+     *      --> sets the respawn of the player
      *      
-     *  Arguments:
-     *      - Vector3 new_position : the position to set as the respawn position
      * */
-    public void SetRespawnPosition(Vector3 newPosition)
+    public void SetRespawn()
     {
         SaveManager.SaveLastSave();
-        SaveManager.SaveToDisk();    
+        SaveManager.SaveToDisk();  
     }
-
-    /**
-     *  SetRespawnRotation(Vector3 new_Position)
-     *      --> sets the respawn rotation of the player
-     *      
-     *  Arguments:
-     *      - Vector3 new_position : the position to set as the respawn rotation
-     * */
-    public void SetRespawnRotation(Quaternion newRotation)
-    {
-        m_RespawnRotation = newRotation;
-    }
-
-    public void SetRespawnGravityDir(Vector3 newGravityDir)
-    {
-        m_RespawnGravityDir = newGravityDir;
-    }
-
-
 
     /**
      * ???????????
@@ -408,4 +419,9 @@ public class ControllerScript : MonoBehaviour
 
         return true;
     }
+	
+	public float GetTime()
+	{
+		return m_Time;
+	}
 }
