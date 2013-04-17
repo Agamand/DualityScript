@@ -196,7 +196,7 @@ public class PauseMenu : MonoBehaviour {
             PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
 
         if (!PlayerPrefs.HasKey("RespawnKey"))
-            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
+            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.R);
 
         if (!PlayerPrefs.HasKey("MouseSensitivity"))
             PlayerPrefs.SetFloat("MouseSensitivity", 80);
@@ -435,10 +435,7 @@ public class PauseMenu : MonoBehaviour {
 	
 
     void OnGUI()
-    {
-        //Stopwatch time = new Stopwatch();
-        //time.Start();
-		
+    {		
 		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
