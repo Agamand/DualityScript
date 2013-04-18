@@ -21,7 +21,7 @@ public class AttractObjectScript : MonoBehaviour {
 	public void Stop()
 	{
 		handleEffect = false;
-		force.setGravityDir(new Vector3(0,-1,0));
+		force.SetGravityDir(new Vector3(0,-1,0));
 	}
 	
 	// Update is called once per frame
@@ -33,7 +33,7 @@ public class AttractObjectScript : MonoBehaviour {
 			Vector3 dir = target_pos-transform.position;
 			float dist = dir.magnitude;
 			dir = Vector3.Normalize(dir);
-			force.setGravityDir(dir);
+			force.SetGravityDir(dir);
 		}
 	
 	}
