@@ -16,7 +16,8 @@ public class EndMenu : MonoBehaviour {
     public GUISkin skin;
 
     private DataBaseHandling m_db_handler;
-	private ScreenEffectScript m_ScreenEffectMenu; 
+	private ScreenEffectScript m_ScreenEffectMenu;
+    private HudScript m_Hud;
 
 
 
@@ -27,6 +28,7 @@ public class EndMenu : MonoBehaviour {
 
         m_db_handler = gameObject.AddComponent<DataBaseHandling>();
         this.enabled = false;
+        m_Hud = GameObject.Find("HUD").GetComponent<HudScript>();
 		
     }
 	
@@ -35,11 +37,16 @@ public class EndMenu : MonoBehaviour {
 		enabled = active;
         Screen.showCursor = active;
         Screen.lockCursor = !active;
-		if(active)
-			m_ScreenEffectMenu.Enable();
-		else
-			m_ScreenEffectMenu.Disable();
-		
+        if (active)
+        {
+            m_Hud.Enable(false);
+            m_ScreenEffectMenu.Enable();
+        }
+        else
+        {
+            m_Hud.Enable(true);
+            m_ScreenEffectMenu.Disable();
+        }
 	}
 
     void OnGUI()

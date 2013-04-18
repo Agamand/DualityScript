@@ -30,6 +30,8 @@ public class PauseMenu : MonoBehaviour {
     private bool m_display_score = true;
     private bool m_display_crosshair = true;
     private bool m_display_hints = true;
+    private HudScript m_Hud;
+
 
 
     private float m_mouse_sensitivity = 2.0f;
@@ -131,6 +133,8 @@ public class PauseMenu : MonoBehaviour {
         comboBoxControl.SetSelectedItemIndex(m_ratio);
         comboBoxQuality.SetSelectedItemIndex(quality);
         comboBoxResolution.SetSelectedItemIndex(m_resolution);
+        m_Hud = GameObject.Find("HUD").GetComponent<HudScript>();
+
     }
 
     /**
@@ -226,6 +230,8 @@ public class PauseMenu : MonoBehaviour {
         }
         else if (st.Equals("video"))
         {
+            m_Hud.EnableCrosshair(m_display_crosshair);
+            m_Hud.EnableScore(m_display_score);
             PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
@@ -372,9 +378,15 @@ public class PauseMenu : MonoBehaviour {
         Screen.showCursor = active;
         Screen.lockCursor = !active;
         if (active)
+        {
+            m_Hud.Enable(false);
             m_ScreenEffectMenu.Enable();
+        }
         else
+        {
+            m_Hud.Enable(true);
             m_ScreenEffectMenu.Disable();
+        }
     }
 	
 
@@ -566,7 +578,6 @@ public class PauseMenu : MonoBehaviour {
             GUI.Label(ResizeGUI(new Rect(200, 110, 100, 40)), "Score :");
 
             m_display_score = GUI.Toggle(ResizeGUI(new Rect(290, 110, 100, 40)), m_display_score, m_display_score ? "Show" : "Hide");
-
 
             GUI.Label(ResizeGUI(new Rect(200, 160, 100, 40)), "Fullscreen :");
 

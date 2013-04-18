@@ -506,9 +506,11 @@ public class MainMenu : MonoBehaviour {
     void OnGUI()
     {
 		
-		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
-		
-		if(SaveManager.CheckSaveFile())
+		GUI.DrawTexture(new Rect(20, 20, 307*1.4f, 31*1.4f),logo);
+        GUI.Label(ResizeGUI(new Rect(20, 470, 500, 40)), "Student project made by Cyril Basset and Jean-Vincent Lamberti", skin.label);
+        GUI.Label(ResizeGUI(new Rect(20, 490, 800, 40)), "For the music tracks all credits goes to Parametric, go check his work at http://http://sgustokmusic.org/", skin.label);
+
+        if (SaveManager.CheckSaveFile())
 		{
         	if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         	{

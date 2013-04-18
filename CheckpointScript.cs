@@ -18,11 +18,14 @@ public class CheckpointScript : MonoBehaviour {
 
     private ControllerScript m_Cs = null;
     public AudioClip m_CheckpointSound;
+    private HudScript m_Hud;
     public bool m_PlaySound = true;
+    public bool m_DisplayPrompt = true;
     private bool m_Activated = true;
 
 	void Start () {
         m_Cs = GameObject.FindGameObjectWithTag("Player").GetComponent<ControllerScript>();
+        m_Hud = GameObject.Find("HUD").GetComponent<HudScript>();
 	}
 	
 
@@ -39,9 +42,13 @@ public class CheckpointScript : MonoBehaviour {
         {
             if (m_Activated)
             {
+                Debug.Log("Trigger : OnCheckPoint");
+                SetRespawnIntel();
                 if (m_PlaySound)
                     audio.PlayOneShot(m_CheckpointSound, PlayerPrefs.GetFloat("SoundVolume"));
-                SetRespawnIntel();
+                if (m_DisplayPrompt)
+                    m_Hud.DisplayPrompt();
+                
             }
         }
     }
