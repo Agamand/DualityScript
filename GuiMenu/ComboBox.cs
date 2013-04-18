@@ -128,6 +128,11 @@ public class ComboBox
         return GetSelectedItemIndex();
     }
 
+    public void SetSelectedItemIndex(int i)
+    {
+        selectedItemIndex = i;
+    }
+
     public int GetSelectedItemIndex()
     {
         return selectedItemIndex;

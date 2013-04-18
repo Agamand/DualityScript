@@ -48,9 +48,9 @@ public class PauseMenu : MonoBehaviour {
     private static String[] m_keybindings;
     private static String[] ratio_string = { "4/3", "16/10", "16/9" };
     private static String[] resolution_4_3 = { "640x480", "800x600", "1024x768", "1280x960", "1440x1080" };
-    private static String[] resolution_16_10 = { "1280x800", "1440x900", "1680x1050" };
-    private static String[] resolution_16_9 = { "1280x720", "1366x768", "1600x900", "1920x1080", "2560×1440" };
-    private static String[] quality_string = { "Fastest", "Fast", "Simple", "Good", "Beautiful", "Fanstatic" };
+    private static String[] resolution_16_10 = { "1280x800", "1440x900", "1680x1050", "1920x1200", "2560x1600" };
+    private static String[] resolution_16_9 = { "1280x720", "1366x768", "1600x900", "1920x1080", "2560x1440" };
+    private static String[] quality_string = { "Fast", "Good", "Beautiful", "Fanstatic" };
     private GUIContent[] ratio_combobox;
 
     private GUIContent[] _4_3_combobox;
@@ -113,10 +113,101 @@ public class PauseMenu : MonoBehaviour {
             m_quality[i] = new GUIContent(quality_string[i]);
 
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
+        InitializePlayerPrefs();
         LoadKeysFromPrefs();
         LoadFromPlayerPrefs("video");
         m_db_handler = gameObject.AddComponent<DataBaseHandling>();
         this.enabled = false;
+        comboBoxControl.SetSelectedItemIndex(m_ratio);
+        comboBoxQuality.SetSelectedItemIndex(quality);
+        comboBoxResolution.SetSelectedItemIndex(m_resolution);
+    }
+
+    void InitializePlayerPrefs()
+    {
+        if (!PlayerPrefs.HasKey("MaxLevelReached"))
+            PlayerPrefs.SetInt("MaxLevelReached", 1);
+
+        if (!PlayerPrefs.HasKey("Score"))
+            PlayerPrefs.SetFloat("Score", 0);
+
+        if (!PlayerPrefs.HasKey("ElapsedTime"))
+            PlayerPrefs.SetFloat("ElapsedTime", 0);
+
+        if (!PlayerPrefs.HasKey("DeathCount"))
+            PlayerPrefs.SetInt("DeathCount", 0);
+
+        if (!PlayerPrefs.HasKey("MusicVolume"))
+            PlayerPrefs.SetFloat("MusicVolume", 7);
+
+        if (!PlayerPrefs.HasKey("SoundVolume"))
+            PlayerPrefs.SetFloat("SoundVolume", 5);
+
+        if (!PlayerPrefs.HasKey("AspectRatio"))
+            PlayerPrefs.SetInt("AspectRatio", 2);
+
+        if (!PlayerPrefs.HasKey("Resolution"))
+            PlayerPrefs.SetInt("Resolution", 0);
+
+        if (!PlayerPrefs.HasKey("QualityLevel"))
+            PlayerPrefs.SetInt("QualityLevel", 2);
+
+        if (Application.isWebPlayer)
+            PlayerPrefs.SetInt("Fullscreen", 0);
+        else if (!PlayerPrefs.HasKey("Fullscreen"))
+            PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
+
+        if (!PlayerPrefs.HasKey("DisplayScore"))
+            PlayerPrefs.SetInt("DisplayScore", 1);
+
+        if (!PlayerPrefs.HasKey("DisplayCrosshair"))
+            PlayerPrefs.SetInt("DisplayCrosshair", 1);
+
+        if (!PlayerPrefs.HasKey("DisplayHints"))
+            PlayerPrefs.SetInt("DisplayHints", 1);
+
+        if (!PlayerPrefs.HasKey("FOV"))
+            PlayerPrefs.SetFloat("FOV", 90);
+
+        if (!PlayerPrefs.HasKey("MenuKey"))
+        {
+            if (Application.isWebPlayer)
+                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.F1);
+            else
+                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.Escape);
+        }
+
+        if (!PlayerPrefs.HasKey("JumpKey"))
+            PlayerPrefs.SetInt("JumpKey", (int)KeyCode.Space);
+
+        if (!PlayerPrefs.HasKey("ForwardKey"))
+            PlayerPrefs.SetInt("ForwardKey", (int)KeyCode.Z);
+
+        if (!PlayerPrefs.HasKey("BackwardKey"))
+            PlayerPrefs.SetInt("BackwardKey", (int)KeyCode.S);
+
+        if (!PlayerPrefs.HasKey("StrafeLeftKey"))
+            PlayerPrefs.SetInt("StrafeLeftKey", (int)KeyCode.Q);
+
+        if (!PlayerPrefs.HasKey("StrafeRightKey"))
+            PlayerPrefs.SetInt("StrafeRightKey", (int)KeyCode.D);
+
+        if (!PlayerPrefs.HasKey("SwitchWorldKey"))
+            PlayerPrefs.SetInt("SwitchWorldKey", (int)KeyCode.A);
+
+        if (!PlayerPrefs.HasKey("CarryObjectKey"))
+            PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
+
+        if (!PlayerPrefs.HasKey("RespawnKey"))
+            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
+
+        if (!PlayerPrefs.HasKey("MouseSensitivity"))
+            PlayerPrefs.SetFloat("MouseSensitivity", 80);
+
+        if (!PlayerPrefs.HasKey("InvertedMouse"))
+            PlayerPrefs.SetInt("InvertedMouse", 1);
+
+        PlayerPrefs.Save();
     }
 
     void LoadResolution()
@@ -131,6 +222,7 @@ public class PauseMenu : MonoBehaviour {
             resSt = resolution_16_10[m_resolution];
         else
             resSt = resolution_16_9[m_resolution];
+
 
         String[] resTab = resSt.Split('x');
 
@@ -161,7 +253,6 @@ public class PauseMenu : MonoBehaviour {
             m_fov = PlayerPrefs.GetFloat("FOV");
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
-            Screen.fullScreen = m_fullscreen;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
             quality = PlayerPrefs.GetInt("QualityLevel");
             QualitySettings.SetQualityLevel(quality);
@@ -203,14 +294,10 @@ public class PauseMenu : MonoBehaviour {
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
             PlayerPrefs.SetInt("DisplayScore", m_display_score ? 1 : 0);
-            PlayerPrefs.SetInt("QualityLevel", quality);
             PlayerPrefs.SetInt("Fullscreen", m_fullscreen ? 1 : 0);
-
-            if (!Application.isWebPlayer)
-            {
-                PlayerPrefs.SetInt("AspectRatio", m_ratio);
-                PlayerPrefs.SetInt("Resolution", m_resolution);
-            }
+            PlayerPrefs.SetInt("AspectRatio", m_ratio);
+            PlayerPrefs.SetInt("Resolution", m_resolution);
+            PlayerPrefs.SetInt("QualityLevel", quality);
 
         }
         else if (st.Equals("sound"))
@@ -471,47 +558,60 @@ public class PauseMenu : MonoBehaviour {
 
             LoadFromPlayerPrefs("video");
 
-            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
-            GUI.BeginGroup(ResizeGUI(new Rect(310, 180, 500, 600)));
+            GUI.Box(ResizeGUI(new Rect(260, 120, 550, 400)), "Video Settings", skin.box);
+            GUI.BeginGroup(ResizeGUI(new Rect(310, 120, 500, 600)));
 
-            GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)), "Aspect Ratio", skin.label);
-
-            int selGrid;
-
-            GUI.Label(ResizeGUI(new Rect(40, 100, 100, 40)), "Resolution", skin.label);
-			
-            if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 200, 100, 30)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+            if (!Application.isWebPlayer)
             {
-                quality = selGrid;
+
+                GUI.Label(ResizeGUI(new Rect(35, 30, 100, 40)), "Aspect Ratio", skin.label);
+
+                int selGrid;
+                if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 330, 100, 20)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+                {
+                    quality = selGrid;
+                }
+
+                GUI.Label(ResizeGUI(new Rect(40, 140, 100, 40)), "Resolution", skin.label);
+
+                switch (m_ratio)
+                {
+                    case 0:
+                        if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 170, 100, 20)), _4_3_combobox[m_resolution].text, _4_3_combobox, skin.customStyles[0])) != m_resolution)
+                        {
+                            m_resolution = selGrid;
+                        }
+                        break;
+                    case 1:
+                        if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 170, 100, 20)), _16_10_combobox[m_resolution].text, _16_10_combobox, skin.customStyles[0])) != m_resolution)
+                        {
+                            m_resolution = selGrid;
+                        }
+                        break;
+                    case 2:
+                        if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 170, 100, 20)), _16_9_combobox[m_resolution].text, _16_9_combobox, skin.customStyles[0])) != m_resolution)
+                        {
+                            m_resolution = selGrid;
+                        }
+                        break;
+                }
+
+                GUI.Label(ResizeGUI(new Rect(50, 300, 100, 40)), "Quality", skin.label);
+
+                if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 20)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
+                {
+                    m_ratio = selGrid;
+                }
             }
-			
-            switch (m_ratio)
+            else
             {
-                case 0:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _4_3_combobox[m_resolution].text, _4_3_combobox, skin.customStyles[0])) != m_resolution)
-                    {
-                        m_resolution = selGrid;
-                    }
-                    break;
-                case 1:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_10_combobox[m_resolution].text, _16_10_combobox, skin.customStyles[0])) != m_resolution)
-                    {
-                        m_resolution = selGrid;
-                    }
-                    break;
-                case 2:
-                    if ((selGrid = comboBoxResolution.List(ResizeGUI(new Rect(20, 130, 100, 30)), _16_9_combobox[m_resolution].text, _16_9_combobox, skin.customStyles[0])) != m_resolution)
-                    {
-                        m_resolution = selGrid;
-                    }
-                    break;
-            }
+                int selGrid;
+                GUI.Label(ResizeGUI(new Rect(50, 100, 100, 40)), "Quality", skin.label);
+                if ((selGrid = comboBoxQuality.List(ResizeGUI(new Rect(20, 130, 100, 20)), m_quality[quality].text, m_quality, skin.customStyles[0])) != quality)
+                {
+                    quality = selGrid;
+                }
 
-            GUI.Label(ResizeGUI(new Rect(50, 170, 100, 40)), "Quality", skin.label);
-			
-            if ((selGrid = comboBoxControl.List(ResizeGUI(new Rect(20, 60, 100, 30)), ratio_combobox[m_ratio].text, ratio_combobox, skin.customStyles[0])) != m_ratio)
-            {
-                m_ratio = selGrid;
             }
 
             GUI.Label(ResizeGUI(new Rect(230, 30, 100, 40)), "Field of view", skin.label);
@@ -536,6 +636,7 @@ public class PauseMenu : MonoBehaviour {
             m_display_hints = GUI.Toggle(ResizeGUI(new Rect(290, 260, 100, 40)), m_display_hints, m_display_hints == true ? "  Show" : "  Hide", skin.toggle);
 
             GUI.EndGroup();
+
             SetPlayerPrefs("video");
 
         }
