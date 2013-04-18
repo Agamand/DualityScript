@@ -28,7 +28,10 @@ public sealed class VersionDeserializationBinder : SerializationBinder
     } 
 }
 
-
+/**
+ * public class Vector3Serializable
+ *  --> allows to serialize Vector3
+ * */
 [System.Serializable]
 [XmlRoot("vec3")]
 public class Vector3Serializable
@@ -63,6 +66,11 @@ public class Vector3Serializable
 	}
 }
 
+
+/**
+ * public class QuaternionSerializable
+ *  --> allows to serialize Quaternions 
+ * */
 [System.Serializable]
 [XmlRoot("quat")]
 public class QuaternionSerializable
@@ -101,6 +109,10 @@ public class QuaternionSerializable
 	}
 }
 
+/*
+ * public class TransformSerializable
+ *  --> allows to serialize Transform
+ * */
 [System.Serializable]
 public class TransformSerializable
 {
@@ -125,6 +137,11 @@ public class TransformSerializable
 		t.localScale = scale.ToVector3();
 	}
 }
+
+/*
+ * public class TransformSerializable
+ *  --> allows to serialize RigidBody
+ * */
 
 [System.Serializable]
 [XmlRoot("rigidbody")]
@@ -151,14 +168,17 @@ public class RigidBodySerializable
 }
 
 
-
+/*
+ * public class Save
+ *  --> allows to serialize any object, using previously defined serialization classes
+ * */
 [System.Serializable]
 public class Save
 {
 	[XmlAttribute("id")]
 	public int m_Id;
-	
-	public string m_Name;
+
+    public string m_Name = "";
 	
 	public TransformSerializable m_Transform = new TransformSerializable();
 	
@@ -167,7 +187,7 @@ public class Save
 	public Vector3Serializable m_Gravity = new Vector3Serializable();
 	
 	[XmlAttribute("enable")]
-	public bool m_Enable;
+    public bool m_Enable = false;
 	
 	public Save()
 	{
@@ -179,7 +199,10 @@ public class Save
 	}
 }
 
-
+/*
+ * public class GameSave
+ *  --> allows to serialize every serialized objects and global info
+ * */
 [System.Serializable]
 [XmlRoot("gamesave")]
 public class GameSave
@@ -217,12 +240,27 @@ public class GameSave
 	}
 }
 
+/*
+ * public static class SaveManager
+ *  --> static class allowing to save to disk every serialized objects at any given time
+ *  
+ * Members:
+ *  - public static GameSave last_save: the last GameSave that has been saved
+ *	- public static bool m_MustLoad: force the SaveManager to load
+ *	- private static string m_FilePath: the file path used to save data on hard disk if the user in the stand alone mode
+ *	
+ * Authors : Cyril Basset
+ * */
 public static class SaveManager
 {
 	public static GameSave last_save = null;
 	public static bool m_MustLoad = false;
 	private static string m_FilePath = Application.dataPath + "/save.dat";
 
+    /**
+     * LoadFromDisk()
+     *  --> loads a GameSave from the Hard Disk if stand alone, from the playerPrefs if in WebPlayer
+     * */
 	public static void LoadFromDisk()
 	{
 		if(Application.isWebPlayer)
@@ -240,7 +278,6 @@ public static class SaveManager
 				return;
 			}
 			last_save = gamesave;
-			
 		}
 		else
 		{
@@ -256,6 +293,10 @@ public static class SaveManager
 		}
 	}
 	
+    /**
+     * LoadLastSave()
+     *  --> loads the last allocated GameSave
+     * */
 	public static void LoadLastSave()
 	{
 		if(last_save == null)
@@ -278,10 +319,7 @@ public static class SaveManager
 			Saveable savecomponent = go.GetComponent<Saveable>();
 			if(savecomponent == null)
 				continue;
-			
-			if(!go.name.Equals(save.m_Name))
-				Debug.Log("WHAT IN THE HELL! " + go.name + "!=" + save.m_Name);
-			
+						
 			savecomponent.Load(save);
 			id++;
 			save = last_save.GetSave(id);
@@ -297,7 +335,10 @@ public static class SaveManager
 	}
 	
 	
-	
+	/**
+     * SaveLastSave()
+     *  --> overwrite the last GameSave allocated
+     * */
 	public static void SaveLastSave()
 	{
 		if(m_MustLoad)
@@ -343,6 +384,10 @@ public static class SaveManager
 		last_save = gamesave;	
 	}
 	
+    /**
+     * SaveToDisk()
+     *  --> Writes the last save to disk if in stand alone, in PlayerPrefs if in WebPlayer
+     * */
 	public static void SaveToDisk()
 	{
 		if(last_save == null && !PlayerPrefs.HasKey("Playthrough"))
@@ -365,14 +410,22 @@ public static class SaveManager
 			s.Close();
 		}
 	}
-	
-	public static bool CheckSaveFile()
+
+    /**
+     * CheckSaveFile()
+     *  --> Checks whether or not the player has a save file
+     * */
+    public static bool CheckSaveFile()
 	{
         if (Application.isWebPlayer)
 			return PlayerPrefs.HasKey("save");
 		return System.IO.File.Exists(m_FilePath);
 	}
 	
+    /**
+     * DeleteSaveFile()
+     *  --> Delete the save file
+     * */
 	public static void DeleteSaveFile()
 	{
         if (Application.isWebPlayer)

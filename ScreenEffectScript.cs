@@ -1,3 +1,15 @@
+/**
+* ScreenEffectScript
+*  --> Screen Effect used for pause menu and world 2 filter
+*  
+* Members: 
+*  - public Material m_Effect : The Material to apply the effect with
+*  - private Camera m_Camera : the camera on which the script is assigned to
+*  - private bool m_IsInit: defines whether or not the effect is active
+*
+* Authors: Cyril Basset
+* */
+
 using UnityEngine;
 using System.Collections;
 
@@ -16,8 +28,7 @@ public class ScreenEffectScript : MonoBehaviour {
 	void Start () 
     {
 
-        m_GameObject = gameObject;
-        m_Camera = m_GameObject.AddComponent<Camera>();
+        m_Camera = gameObject.AddComponent<Camera>();
         m_Camera.orthographic = true;
         m_Camera.orthographicSize = 1.0f;
         m_Camera.clearFlags = CameraClearFlags.Nothing;

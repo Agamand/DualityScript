@@ -1,3 +1,12 @@
+/**
+ * 
+ * WARNING : THE USE OF THIS GAMEPLAY MECHANIC HAS BEEN REVISED FOR GAME DESIGN PURPOSES, IT IS NOT USED IN THE CURRENT BUILD
+ * 
+ * public class AttractObjectScript
+ *  --> allows to manipulate the attraction between given objects
+ * 
+ * Authors: Cyril Basset
+ * */
 using UnityEngine;
 using System.Collections;
 

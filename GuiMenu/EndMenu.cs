@@ -1,3 +1,12 @@
+/**
+ *  EndMenu
+ *      --> The Script for end level menu 
+ *          - handles the pursuit of the game
+ *          - handles the upload of the score if the user has respected required conditions
+ *      
+ *  Authors: Cyril Basset
+ **/
+
 using UnityEngine;
 using System.Collections;
 using System;

@@ -18,7 +18,7 @@
 *  - private Vector3[] m_Translations: the Vector on which you want the translation to happen considering m_Axis
 *  - private Renderer[] m_BumpersRenderer: the renderers of the bumpers attached to the platform
 *
-* Authors: Jean-Vincent Lamberti
+* Authors: Jean-Vincent Lamberti, Cyril Basset
 * */
 
 using UnityEngine;
@@ -41,8 +41,8 @@ public class MovingPlatformScript : MonoBehaviour {
 	private AnimationClip m_Forward;
 	private float m_MaxTime;
 
-	// Use this for initialization
-	void Start () {
+
+    void Start () {
         m_InitialPosition = gameObject.transform.localPosition;
         m_WorldControler = GameObject.Find("GameWorld").GetComponent<WorldControllerScript>();
         m_CurrentWorldNumber = m_WorldControler.GetCurrentWorldNumber();
@@ -84,7 +84,6 @@ public class MovingPlatformScript : MonoBehaviour {
 		this.animation.Play("Forward");
 	}
 		
-	// Update is called once per frame
 	void Update () {
         m_CurrentWorldNumber = m_WorldControler.GetCurrentWorldNumber();
 		
@@ -115,14 +114,6 @@ public class MovingPlatformScript : MonoBehaviour {
                         r.material.color = Color.red;
                     }
                 }
-                /*if (m_RelPosition[(int)m_Axis] < m_MinIncrement)
-                {
-                    gameObject.transform.Translate(m_Translations[(int)m_Axis] * Time.deltaTime);
-                    m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
-                    m_IsMoving = true;
-                }
-                else
-                    m_IsMoving = false;*/
             }
             else
             {
@@ -133,14 +124,6 @@ public class MovingPlatformScript : MonoBehaviour {
                         r.material.color = Color.blue;
                     }
                 }
-                /*if (m_RelPosition[(int)m_Axis] > m_MaxIncrement * -1)
-                {
-                    gameObject.transform.Translate(-1 * m_Translations[(int)m_Axis] * Time.deltaTime);
-                    m_RelPosition = gameObject.transform.localPosition - m_InitialPosition;
-                    m_IsMoving = true;
-                }
-                else
-                    m_IsMoving = false;*/
             }
         }
         m_LastUpdateWorldNumber = m_CurrentWorldNumber;

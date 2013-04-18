@@ -16,7 +16,7 @@
 *  - private Vector3[] m_Translations: the Vector on which you want the translation to happen considering m_Axis
 *  - private bool m_IsAtEnd: allows to know wether or not the platform is at one end of its perpetual movement
 *
-* Authors: Jean-Vincent Lamberti
+* Authors: Jean-Vincent Lamberti, Cyril Basset
 * */
 
 

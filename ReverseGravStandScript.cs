@@ -5,7 +5,8 @@
  * 
  *  Members: 
  *      - public Vector3 m_Gravity: the Vector3 representing the gravity of the gameObject
- *      
+ *      - public AudioClip m_Sound: the soundclip to play when the platform is triggered
+ * 
  * Authors: Cyril Basset
  * */
 

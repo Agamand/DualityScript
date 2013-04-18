@@ -7,7 +7,6 @@
  *          - allows to see the top ten high scores
  *          - allows to change every option of the game
  *  
- *  Members: 
  *      
  *  Authors: Cyril Basset, Jean-Vincent Lamberti
  **/
@@ -144,19 +143,14 @@ public class MainMenu : MonoBehaviour {
         comboBoxResolution.SetSelectedItemIndex(m_resolution);
     }
 
+    /*
+     * InitializePlayerPrefs()
+     *  Creates the player prefs concerning options and preferences
+     * */
     void InitializePlayerPrefs()
     {
         if (!PlayerPrefs.HasKey("MaxLevelReached"))
             PlayerPrefs.SetInt("MaxLevelReached", 1);
-
-        if (!PlayerPrefs.HasKey("Score"))
-            PlayerPrefs.SetFloat("Score", 0);
-
-        if (!PlayerPrefs.HasKey("ElapsedTime"))
-            PlayerPrefs.SetFloat("ElapsedTime", 0);
-
-        if (!PlayerPrefs.HasKey("DeathCount"))
-            PlayerPrefs.SetInt("DeathCount", 0);
 
         if (!PlayerPrefs.HasKey("MusicVolume"))
             PlayerPrefs.SetFloat("MusicVolume", 7);
@@ -231,6 +225,10 @@ public class MainMenu : MonoBehaviour {
           PlayerPrefs.Save();
     }
 
+    /**
+     * LoadResolution()
+     *  --> loads and set the resolutions to the parameters given by the user in the options menu
+     * */
     void LoadResolution()
     {
         m_ratio = PlayerPrefs.GetInt("AspectRatio");
@@ -251,6 +249,10 @@ public class MainMenu : MonoBehaviour {
 
     }
 
+    /**
+     * LoadFromPlayerPrefs()
+     *  -> assign corresponding values to UI elements from PlayerPrefs
+     * */
     void LoadFromPlayerPrefs(String st="")
     {
         if (st.Equals(""))
@@ -292,6 +294,10 @@ public class MainMenu : MonoBehaviour {
         }
     }
 
+    /**
+     * SetPlayerPrefs()
+     *  --> sets the player prefs to match ui component values
+     * */
     void SetPlayerPrefs(String st = "")
     {
         if (st.Equals(""))
@@ -406,6 +412,10 @@ public class MainMenu : MonoBehaviour {
         return "nc";
     }
 
+    /**
+     * LoadKeysFromPrefs()
+     *  --> assign gui component values concerning key bindings to match player prefs values
+     * */
     void LoadKeysFromPrefs()
     {
         m_keybindings[0] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("ForwardKey"));
@@ -417,7 +427,10 @@ public class MainMenu : MonoBehaviour {
         m_keybindings[6] =  GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("RespawnKey"));
     }
 
-
+    /**
+     * SetKeysPlayerPrefs()
+     *  --> sets players prefs concerning key bindings to match gui component values
+     * */
     void SetKeysPlayerPrefs()
     {
         KeyCode kb;
@@ -444,6 +457,10 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("RespawnKey", (int)kb);
     }
 
+    /**
+     * LoadPlayerPrefsConnection()
+     *  --> assign corresponding values to gui component to match player prefs values concerning the account options 
+     * */
     void LoadPlayerPrefsConnection()
     {
         if (PlayerPrefs.HasKey("IsLoggedIn"))
@@ -453,6 +470,10 @@ public class MainMenu : MonoBehaviour {
         }
     }
     
+    /**
+     * SetPlayerPrefsConnection()
+     *  --> sets the player prefs values to match gui component values concerning account options
+     * */
     void SetPlayerPrefsConnection()
     {
         PlayerPrefs.SetString("Username", username);

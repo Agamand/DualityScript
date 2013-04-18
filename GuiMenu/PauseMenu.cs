@@ -1,3 +1,14 @@
+/**
+ *  PauseMenu
+ *      --> The Script for the pause menu : 
+ *          - handles all player prefs for options preferences
+ *          - allows to see the top ten high scores
+ *          - allows to change every option of the game
+ *  
+ *      
+ *  Authors: Cyril Basset, Jean-Vincent Lamberti
+ **/
+
 using UnityEngine;
 using System.Collections;
 using System;
@@ -113,7 +124,6 @@ public class PauseMenu : MonoBehaviour {
             m_quality[i] = new GUIContent(quality_string[i]);
 
         skin.customStyles[0].hover.background = skin.customStyles[0].onHover.background = new Texture2D(2, 2);
-        InitializePlayerPrefs();
         LoadKeysFromPrefs();
         LoadFromPlayerPrefs("video");
         m_db_handler = gameObject.AddComponent<DataBaseHandling>();
@@ -123,93 +133,10 @@ public class PauseMenu : MonoBehaviour {
         comboBoxResolution.SetSelectedItemIndex(m_resolution);
     }
 
-    void InitializePlayerPrefs()
-    {
-        if (!PlayerPrefs.HasKey("MaxLevelReached"))
-            PlayerPrefs.SetInt("MaxLevelReached", 1);
-
-        if (!PlayerPrefs.HasKey("Score"))
-            PlayerPrefs.SetFloat("Score", 0);
-
-        if (!PlayerPrefs.HasKey("ElapsedTime"))
-            PlayerPrefs.SetFloat("ElapsedTime", 0);
-
-        if (!PlayerPrefs.HasKey("DeathCount"))
-            PlayerPrefs.SetInt("DeathCount", 0);
-
-        if (!PlayerPrefs.HasKey("MusicVolume"))
-            PlayerPrefs.SetFloat("MusicVolume", 7);
-
-        if (!PlayerPrefs.HasKey("SoundVolume"))
-            PlayerPrefs.SetFloat("SoundVolume", 5);
-
-        if (!PlayerPrefs.HasKey("AspectRatio"))
-            PlayerPrefs.SetInt("AspectRatio", 2);
-
-        if (!PlayerPrefs.HasKey("Resolution"))
-            PlayerPrefs.SetInt("Resolution", 0);
-
-        if (!PlayerPrefs.HasKey("QualityLevel"))
-            PlayerPrefs.SetInt("QualityLevel", 2);
-
-        if (Application.isWebPlayer)
-            PlayerPrefs.SetInt("Fullscreen", 0);
-        else if (!PlayerPrefs.HasKey("Fullscreen"))
-            PlayerPrefs.SetInt("Fullscreen", Screen.fullScreen ? 1 : 0);
-
-        if (!PlayerPrefs.HasKey("DisplayScore"))
-            PlayerPrefs.SetInt("DisplayScore", 1);
-
-        if (!PlayerPrefs.HasKey("DisplayCrosshair"))
-            PlayerPrefs.SetInt("DisplayCrosshair", 1);
-
-        if (!PlayerPrefs.HasKey("DisplayHints"))
-            PlayerPrefs.SetInt("DisplayHints", 1);
-
-        if (!PlayerPrefs.HasKey("FOV"))
-            PlayerPrefs.SetFloat("FOV", 90);
-
-        if (!PlayerPrefs.HasKey("MenuKey"))
-        {
-            if (Application.isWebPlayer)
-                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.F1);
-            else
-                PlayerPrefs.SetInt("MenuKey", (int)KeyCode.Escape);
-        }
-
-        if (!PlayerPrefs.HasKey("JumpKey"))
-            PlayerPrefs.SetInt("JumpKey", (int)KeyCode.Space);
-
-        if (!PlayerPrefs.HasKey("ForwardKey"))
-            PlayerPrefs.SetInt("ForwardKey", (int)KeyCode.Z);
-
-        if (!PlayerPrefs.HasKey("BackwardKey"))
-            PlayerPrefs.SetInt("BackwardKey", (int)KeyCode.S);
-
-        if (!PlayerPrefs.HasKey("StrafeLeftKey"))
-            PlayerPrefs.SetInt("StrafeLeftKey", (int)KeyCode.Q);
-
-        if (!PlayerPrefs.HasKey("StrafeRightKey"))
-            PlayerPrefs.SetInt("StrafeRightKey", (int)KeyCode.D);
-
-        if (!PlayerPrefs.HasKey("SwitchWorldKey"))
-            PlayerPrefs.SetInt("SwitchWorldKey", (int)KeyCode.A);
-
-        if (!PlayerPrefs.HasKey("CarryObjectKey"))
-            PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
-
-        if (!PlayerPrefs.HasKey("RespawnKey"))
-            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
-
-        if (!PlayerPrefs.HasKey("MouseSensitivity"))
-            PlayerPrefs.SetFloat("MouseSensitivity", 80);
-
-        if (!PlayerPrefs.HasKey("InvertedMouse"))
-            PlayerPrefs.SetInt("InvertedMouse", 1);
-
-        PlayerPrefs.Save();
-    }
-
+    /**
+     * LoadResolution()
+     *  --> loads and set the resolutions to the parameters given by the user in the options menu
+     * */
     void LoadResolution()
     {
         m_ratio = PlayerPrefs.GetInt("AspectRatio");
@@ -230,6 +157,11 @@ public class PauseMenu : MonoBehaviour {
 
     }
 
+
+    /**
+     * LoadFromPlayerPrefs()
+     *  -> assign corresponding values to UI elements from PlayerPrefs
+     * */
     void LoadFromPlayerPrefs(String st = "")
     {
         if (st.Equals(""))
@@ -271,6 +203,10 @@ public class PauseMenu : MonoBehaviour {
         }
     }
 
+    /**
+     * SetPlayerPrefs()
+     *  --> sets the player prefs to match ui component values
+     * */
     void SetPlayerPrefs(String st = "")
     {
         if (st.Equals(""))
@@ -385,6 +321,10 @@ public class PauseMenu : MonoBehaviour {
         return "nc";
     }
 
+    /**
+     * LoadKeysFromPrefs()
+     *  --> assign gui component values concerning key bindings to match player prefs values
+     * */
     void LoadKeysFromPrefs()
     {
         m_keybindings[0] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("ForwardKey"));
@@ -396,7 +336,10 @@ public class PauseMenu : MonoBehaviour {
         m_keybindings[6] = GetStringFromKeycode((KeyCode)PlayerPrefs.GetInt("RespawnKey"));
     }
 
-
+    /**
+     * SetKeysPlayerPrefs()
+     *  --> sets players prefs concerning key bindings to match gui component values
+     * */
     void SetKeysPlayerPrefs()
     {
         KeyCode kb;

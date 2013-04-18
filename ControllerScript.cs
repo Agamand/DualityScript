@@ -20,11 +20,6 @@
  *      private Vector3 m_InitialVelocity : the velocity of the player when respawning
  *	    private JumperScript m_JumpHandler : the JumperScript attached to the "Jumper" GameObject composing the player prefab
  *	    private WorldControlerScript m_WorldHandler : the WorldControlerScript attached to the scene "GameWorld" on which the player and the world he's in depends
- *      private Quaternion m_Oldquaternion : 
- *      private Quaternion m_Newquaternion : 
- *      private float m_AnimationTimer :
- *      private const float m_AnimationTime :
- *      private bool m_IsInAnimation : 
  *      
  *  Authors: Cyril Basset, Jean-Vincent Lamberti
  **/
@@ -44,10 +39,6 @@ public class ControllerScript : MonoBehaviour
     public float m_Baseforce = 40000;
     private float m_Incl;
     private float m_Rot_Y;
-    private Vector3 m_RespawnPosition;
-    private Vector3 m_RespawnGravityDir;
-    private Quaternion m_RespawnRotation;
-    private Vector3 m_InitialVelocity;
     private ArrayList m_goToLoad;
     private Collider m_PlayerCollider;
     private bool m_GoForward;
@@ -89,11 +80,7 @@ public class ControllerScript : MonoBehaviour
         GameObject world = GameObject.Find("GameWorld");
         m_WorldHandler = world.GetComponent<WorldControllerScript>();
         Screen.showCursor = false;
-        m_RespawnPosition = transform.position;
-        m_RespawnRotation = transform.rotation;
-        m_InitialVelocity.Set(0, 0, 0);
         m_LocalGravityScript = gameObject.GetComponent<LocalGravityScript>();
-        m_RespawnGravityDir = m_LocalGravityScript.GetStartDir();
         m_AttachToPlayer = GameObject.Find("Grabber").GetComponent<AttachToPlayerScript>();
         m_Camera = transform.FindChild("Camera").gameObject;
         Screen.lockCursor = true;
@@ -104,20 +91,16 @@ public class ControllerScript : MonoBehaviour
 		m_Hud = GameObject.Find("HUD").GetComponent<HudScript>();
     }
 
-    /**
-     * ???????
-     **/
     private float Modulof(float a, float b)
     {
         return (a - b * Mathf.Floor(a / b));
     }
 
     /**
-     * ??????
+     * Called when the user presses the mouse button
      * */
     void OnMouseDown()
     {
-        // Lock the cursor
         Screen.lockCursor = true;
     }
 

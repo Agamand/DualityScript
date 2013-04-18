@@ -5,8 +5,9 @@
  *         
  *  Members: 
  *      - private ControlerScript m_Cs : the ControlerScript attached to the player
- *      - public Quaternion playerRotation : the rotation to give to the player when respawning     
- * 
+ *      - public AudioClip : the soundclip to play when the player enters the checkpoint
+ *      - public bool m_PlaySound : defines whether or not the sound should be played
+ *
  *  Authors: Jean-Vincent Lamberti
  **/
 
@@ -15,15 +16,11 @@ using System.Collections;
 
 public class CheckpointScript : MonoBehaviour {
 
-    public GameObject[] m_GameObjects;
     private ControllerScript m_Cs = null;
-    public enum WorldIndexEnum { World1, World2 };
-    public WorldIndexEnum m_WorldIndex = 0;
     public AudioClip m_CheckpointSound;
     public bool m_PlaySound = true;
     private bool m_Activated = true;
 
-	// Use this for initialization
 	void Start () {
         m_Cs = GameObject.FindGameObjectWithTag("Player").GetComponent<ControllerScript>();
 	}
@@ -79,15 +76,4 @@ public class CheckpointScript : MonoBehaviour {
         m_Cs.SetRespawn();
 	}
 	
-    void SaveSerializedData()
-    {
-        PlayerPrefs.SetInt("World", (int)m_WorldIndex);
-        foreach (GameObject go in m_GameObjects)
-        {
-            PlayerPrefs.SetFloat(go.name + ".transform.position.x", (float)go.transform.position.x);
-            PlayerPrefs.SetFloat(go.name + ".transform.position.y", (float)go.transform.position.y);
-            PlayerPrefs.SetFloat(go.name + ".transform.position.z", (float)go.transform.position.z);
-        }
-
-    }
 }
