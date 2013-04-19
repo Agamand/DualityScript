@@ -391,8 +391,8 @@ public class PauseMenu : MonoBehaviour {
 	
 
     void OnGUI()
-    {		
-		GUI.DrawTexture(new Rect(20f, 20f, 307*1.4f, 31*1.4f),logo);
+    {
+        GUI.DrawTexture(new Rect(20, 40, 307 * 1.4f, 31 * 1.4f), logo);
 
         if (GUI.Button(ResizeGUI(new Rect(20, 150, 100, 30)), "Continue", skin.button))
         {

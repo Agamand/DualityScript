@@ -18,12 +18,14 @@ public class ScreenEffectScript : MonoBehaviour {
     public float m_EffectPriority = 1.0f; // Range [1-infinity]
     public Material m_Effect;
 	public bool m_Animate = false;
+    public bool m_EnableDefault = false;
     private Camera m_Camera = null;
 	private GameObject m_GameObject;
     private GameObject m_EffectRenderer;
     private Mesh m_Plane;
     private bool m_IsInit = false;
 	private Animation m_EnableAnimation;
+    private bool m_Enable = false;
 	
 	void Start () 
     {
@@ -48,6 +50,8 @@ public class ScreenEffectScript : MonoBehaviour {
         m_Plane.uv = _UV;
         m_Plane.triangles = _Indices;
         m_IsInit = true;
+        if (!m_EnableDefault)
+            m_Camera.enabled = false;
 	}
 
     public void Enable()

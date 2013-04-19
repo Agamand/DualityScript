@@ -189,10 +189,7 @@ public class ControllerScript : MonoBehaviour
 		s.time += m_Time;
 		s.m_Saves.Clear();
 		s.level++;
-		s.score = 150000 - (int)s.time*50 - s.deathCount*1000;
-		if(s.score < 0)
-			s.score = 0;
-		
+        s.score = GenerateScore(s.deathCount, s.time);
 		m_Time = 0;
 		SaveManager.SaveToDisk();
 		
@@ -205,6 +202,12 @@ public class ControllerScript : MonoBehaviour
 			PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
 		m_EndMenu.Enable(true);
 	}
+
+    public static int GenerateScore(int death, float time)
+    {
+        int score = 150000 - (int)((time) * 50) - death * 1000;
+        return score > 0 ? score : 0;
+    }
 	
 
     void Update()
@@ -290,7 +293,7 @@ public class ControllerScript : MonoBehaviour
 			m_Time += Time.deltaTime;
 			GameSave s;
 			if((s = SaveManager.last_save) != null)
-				m_Hud.SetScore(150000 - (int)((s.time + m_Time)*50) - s.deathCount*1000);
+                m_Hud.SetScore(GenerateScore(s.deathCount, s.time + m_Time));
         }
         UpdateAnimation();
             
@@ -362,6 +365,8 @@ public class ControllerScript : MonoBehaviour
      * */
     public void SetRespawn()
     {
+        if(m_EndMenu.enabled)
+            return;
         SaveManager.SaveLastSave();
         SaveManager.SaveToDisk();  
     }

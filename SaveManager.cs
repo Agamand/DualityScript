@@ -305,6 +305,8 @@ public static class SaveManager
 		if( Application.loadedLevel != last_save.level)
 		{
 			m_MustLoad = true;
+            if (last_save.level >= Application.levelCount)
+                return;
 			Application.LoadLevel(last_save.level);		
 			return;
 		}
