@@ -255,7 +255,8 @@ public static class SaveManager
 {
 	public static GameSave last_save = null;
 	public static bool m_MustLoad = false;
-	private static string m_FilePath = Application.dataPath + "/save.dat";
+    private static string m_DirPath = (!Application.isWebPlayer ? System.Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) : "") + "/Imaginarium";
+    private static string m_FilePath = m_DirPath + "/save.dat";
 
     /**
      * LoadFromDisk()
@@ -281,14 +282,26 @@ public static class SaveManager
 		}
 		else
 		{
-			Stream s = System.IO.File.Open(m_FilePath,System.IO.FileMode.Open);
-			if(s == null)
-				return;
-			BinaryFormatter f = new BinaryFormatter();	
-			f.Binder = new VersionDeserializationBinder();
-			GameSave gamesave;
-			gamesave = (GameSave)f.Deserialize(s);
-			s.Close();
+            GameSave gamesave = null;
+            try
+            {
+			    Stream s = System.IO.File.Open(m_FilePath,System.IO.FileMode.Open);
+			    if(s == null)
+				    return;
+			    BinaryFormatter f = new BinaryFormatter();	
+			    f.Binder = new VersionDeserializationBinder();
+			
+			    gamesave = (GameSave)f.Deserialize(s);
+			    s.Close();                 
+            }
+            catch (IOException e)
+            { 
+            }
+            if (gamesave == null)
+            {
+                Debug.Log("Warning : deserialization fail");
+                return;
+            }
 			last_save = gamesave;
 		}
 	}
@@ -405,11 +418,22 @@ public static class SaveManager
 		}
 		else
 		{
-			Stream s = System.IO.File.Open(m_FilePath,System.IO.FileMode.Create);
-			BinaryFormatter f = new BinaryFormatter();	
-			f.Binder = new VersionDeserializationBinder(); 
-			f.Serialize(s,last_save);
-			s.Close();
+            Debug.Log(m_FilePath);
+            if (!System.IO.Directory.Exists(m_DirPath))
+                System.IO.Directory.CreateDirectory(m_DirPath);
+            try
+            {
+
+                
+                Stream s = System.IO.File.Open(m_FilePath, System.IO.FileMode.Create);
+                BinaryFormatter f = new BinaryFormatter();
+                f.Binder = new VersionDeserializationBinder();
+                f.Serialize(s, last_save);
+                s.Close();
+            }
+            catch (IOException e)
+            { 
+            }
 		}
 	}
 
@@ -431,7 +455,18 @@ public static class SaveManager
 	public static void DeleteSaveFile()
 	{
         if (Application.isWebPlayer)
-			PlayerPrefs.DeleteKey("save");
-		System.IO.File.Delete(m_FilePath);
+            PlayerPrefs.DeleteKey("save");
+        else
+        {
+            try
+            {
+                System.IO.File.Delete(m_FilePath);
+            }
+            catch (IOException e)
+            {
+            }
+        }
+        //
 	}
+
 }

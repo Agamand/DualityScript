@@ -55,7 +55,7 @@ public class EndMenu : MonoBehaviour {
 		
 		
 		if(Application.loadedLevel == 4)
-			GUI.Label(ResizeGUI(new Rect(320, 210, 160, 30)), "GG  ! trololoGames ! ", skin.customStyles[3]);
+			GUI.Label(ResizeGUI(new Rect(320, 210, 160, 30)), "Congratulations, you've completed the game", skin.customStyles[3]);
 
 		GameSave s = SaveManager.last_save;
 		if(s != null)

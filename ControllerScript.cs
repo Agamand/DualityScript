@@ -195,11 +195,13 @@ public class ControllerScript : MonoBehaviour
 		
 		if(Application.loadedLevel == Application.levelCount-1)
 			SaveManager.DeleteSaveFile();
-		
-		if(PlayerPrefs.HasKey("MaxLevelReached") && PlayerPrefs.GetInt("MaxLevelReached") < Application.loadedLevel + 1)
-			PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
-		else if(!PlayerPrefs.HasKey("MaxLevelReached"))
-			PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
+
+
+        if (Application.loadedLevel < Application.levelCount - 1)
+            PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel + 1);
+        else if (!PlayerPrefs.HasKey("MaxLevelReached"))
+            PlayerPrefs.SetInt("MaxLevelReached", Application.loadedLevel);
+
 		m_EndMenu.Enable(true);
 	}
 

@@ -109,7 +109,6 @@ public class EdgeTracerScript : MonoBehaviour {
         m_edges_rendered = new List<Edge>();
         m_faces = new List<Face>();
         m_gameObjects = new List<LineRenderer>();
-        Debug.Log("Generate Edge Renderer for mesh with " + m.vertices.Length + " vertices, " + m.triangles.Length + " triangles");
         GenerateFaces();
         GenerateEdges();
         GenerateLine();
@@ -118,13 +117,11 @@ public class EdgeTracerScript : MonoBehaviour {
     private void GenerateFaces()
     {
         int max = m.triangles.Length/3;
-        Debug.Log(max);
         for (int i = 0; i < max; i++)
         {
             Face f = new Face(m.vertices[m.triangles[i * 3]], m.vertices[m.triangles[i * 3+1]], m.vertices[m.triangles[i * 3+2]]);
             m_faces.Add(f);
         }
-        Debug.Log(m_faces.Count + " faces found");
 
     }
 
@@ -136,7 +133,6 @@ public class EdgeTracerScript : MonoBehaviour {
             foreach(Edge e in edges)
                 AppendEdge(e);
         }
-        Debug.Log(m_edges.Count + " edges found");
 	}
 	
 	private void AppendEdge(Edge e)
@@ -178,13 +174,9 @@ public class EdgeTracerScript : MonoBehaviour {
             if (m_edges[i].linkedFace[1] != null)
             {
                 float a = Mathf.Abs(Vector3.Dot(m_edges[i].linkedFace[0].normal(), m_edges[i].linkedFace[1].normal()));
-                Debug.Log("dot : " + a + " on " + m_edges[i].linkedFace[0].normal().ToString() + " " + m_edges[i].linkedFace[1].normal().ToString());
                 if (a > 0.2f)
                     continue;
             }
-
-
-           // Debug.Log("Create Edge line at " + m_edges[i].start.ToString() + " to " + m_edges[i].end.ToString());
 
             GameObject edgeRenderer = new GameObject("EdgeRenderer"+i);
             LineRenderer lineRenderer = edgeRenderer.AddComponent<LineRenderer>();

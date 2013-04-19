@@ -153,10 +153,10 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("MaxLevelReached", 1);
 
         if (!PlayerPrefs.HasKey("MusicVolume"))
-            PlayerPrefs.SetFloat("MusicVolume", 7);
+            PlayerPrefs.SetFloat("MusicVolume", 0.5f);
 
         if (!PlayerPrefs.HasKey("SoundVolume"))
-            PlayerPrefs.SetFloat("SoundVolume", 5);
+            PlayerPrefs.SetFloat("SoundVolume", 0.8f);
 
         if (!PlayerPrefs.HasKey("AspectRatio"))
             PlayerPrefs.SetInt("AspectRatio", 2);
@@ -214,7 +214,7 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("CarryObjectKey", (int)KeyCode.E);
 
       if (!PlayerPrefs.HasKey("RespawnKey"))
-            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.E);
+            PlayerPrefs.SetInt("RespawnKey", (int)KeyCode.R);
 
       if (!PlayerPrefs.HasKey("MouseSensitivity"))
           PlayerPrefs.SetFloat("MouseSensitivity", 80);
@@ -231,9 +231,6 @@ public class MainMenu : MonoBehaviour {
      * */
     void LoadResolution()
     {
-        m_ratio = PlayerPrefs.GetInt("AspectRatio");
-        m_resolution = PlayerPrefs.GetInt("Resolution");
-
         String resSt;
         if (m_ratio == 0)
             resSt = resolution_4_3[m_resolution];
@@ -267,7 +264,6 @@ public class MainMenu : MonoBehaviour {
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
-            LoadResolution();
         }
         else if (st.Equals("video"))
         {
@@ -278,9 +274,11 @@ public class MainMenu : MonoBehaviour {
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
             quality = PlayerPrefs.GetInt("QualityLevel");
+            m_resolution = PlayerPrefs.GetInt("Resolution");
             QualitySettings.SetQualityLevel(quality);
             if (!Application.isWebPlayer)
                 LoadResolution();
+
         }
         else if (st.Equals("sound"))
         {
@@ -317,6 +315,15 @@ public class MainMenu : MonoBehaviour {
         }
         else if (st.Equals("video"))
         {
+            bool _ReloadNeeded = false;
+
+            int _ratio = PlayerPrefs.GetInt("AspectRatio");
+            int _resolution = PlayerPrefs.GetInt("Resolution");
+            bool _fullscreen = PlayerPrefs.GetInt("Fullscreen")  == 1;
+
+            if (_ratio != m_ratio || _resolution != m_resolution || _fullscreen != m_fullscreen)
+                _ReloadNeeded = true;
+
             PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
             PlayerPrefs.SetInt("DisplayHints", m_display_hints ? 1 : 0);
             PlayerPrefs.SetFloat("FOV", m_fov);
@@ -325,6 +332,9 @@ public class MainMenu : MonoBehaviour {
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
             PlayerPrefs.SetInt("Resolution", m_resolution);
             PlayerPrefs.SetInt("QualityLevel", quality);
+
+            if (!Application.isWebPlayer && _ReloadNeeded)
+                LoadResolution();
             
         }
         else if (st.Equals("sound"))
@@ -506,7 +516,9 @@ public class MainMenu : MonoBehaviour {
     void OnGUI()
     {
 		
-		GUI.DrawTexture(new Rect(20, 70, 307*1.4f, 31*1.4f),logo);
+		GUI.DrawTexture(new Rect(20, 50, 307*1.4f, 31*1.4f),logo);
+        GUI.Box(ResizeGUI(new Rect(10, 530, 780, 40)), "", skin.box);
+
         GUI.Label(ResizeGUI(new Rect(20, 530, 500, 40)), "Student project made by Cyril Basset and Jean-Vincent Lamberti", skin.label);
         GUI.Label(ResizeGUI(new Rect(20, 550, 800, 40)), "For the music tracks all credits goes to Parametric, go check his work at http://http://sgustokmusic.org/", skin.label);
 
@@ -654,7 +666,9 @@ public class MainMenu : MonoBehaviour {
             int j=0;
             for (int i = 0; i < max_reached; i++)
             {
-                if (GUI.Button(ResizeGUI(new Rect((i*140)+(i+1)*20, 30 + j, 70 * 2, 70 * 2), true), "Level "+(i+1), skin.button))
+                if (i % 3 == 0)
+                    j++;
+                if (GUI.Button(ResizeGUI(new Rect((i % 3 * 140) + (i % 3 + 1) * 20, (j + 1) * 30 + j * 140 - 170, 70 * 2, 70 * 2), true), "Level " + (i + 1), skin.button))
 				{
 					PlayerPrefs.DeleteKey("Playthrough");
 					SaveManager.last_save = null;
@@ -715,9 +729,7 @@ public class MainMenu : MonoBehaviour {
 		if(submenu == SubMenuSelected.VIDEO_SELECTED)
 		{
 
-            LoadFromPlayerPrefs("video");
-
-            GUI.Box(ResizeGUI(new Rect(260, 120, 550, 400)), "Video Settings", skin.box);
+            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(310, 120, 500, 600)));
 
             if (!Application.isWebPlayer)
@@ -889,11 +901,11 @@ public class MainMenu : MonoBehaviour {
 
             GUI.Label(ResizeGUI(new Rect(220, 50, 100, 40)), "Username", skin.label);
 
-            username = GUI.TextField(ResizeGUI(new Rect(150, 80, 200, 40)), username);
+            username = GUI.TextField(ResizeGUI(new Rect(150, 80, 200, 40)), username, skin.textField);
 
             GUI.Label(ResizeGUI(new Rect(220, 130, 100, 40)), "Password", skin.label);
 
-            password = GUI.PasswordField(ResizeGUI(new Rect(150, 160, 200, 40)), password, '*');
+            password = GUI.PasswordField(ResizeGUI(new Rect(150, 160, 200, 40)), password, '*', skin.textField);
 
             if (GUI.Button(ResizeGUI(new Rect(80, 260, 100, 40)), "Try"))
             {

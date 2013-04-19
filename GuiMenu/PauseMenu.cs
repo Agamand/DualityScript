@@ -143,8 +143,6 @@ public class PauseMenu : MonoBehaviour {
      * */
     void LoadResolution()
     {
-        m_ratio = PlayerPrefs.GetInt("AspectRatio");
-        m_resolution = PlayerPrefs.GetInt("Resolution");
 
         String resSt;
         if (m_ratio == 0)
@@ -180,7 +178,6 @@ public class PauseMenu : MonoBehaviour {
             m_display_score = PlayerPrefs.GetInt("DisplayScore") == 1 ? true : false;
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
-            LoadResolution();
         }
         else if (st.Equals("video"))
         {
@@ -191,9 +188,8 @@ public class PauseMenu : MonoBehaviour {
             m_fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1 ? true : false;
             m_ratio = PlayerPrefs.GetInt("AspectRatio");
             quality = PlayerPrefs.GetInt("QualityLevel");
+            m_resolution = PlayerPrefs.GetInt("Resolution");
             QualitySettings.SetQualityLevel(quality);
-            if (!Application.isWebPlayer)
-                LoadResolution();
         }
         else if (st.Equals("sound"))
         {
@@ -230,6 +226,15 @@ public class PauseMenu : MonoBehaviour {
         }
         else if (st.Equals("video"))
         {
+            bool _ReloadNeeded = false;
+
+            int _ratio = PlayerPrefs.GetInt("AspectRatio");
+            int _resolution = PlayerPrefs.GetInt("Resolution");
+            bool _fullscreen = PlayerPrefs.GetInt("Fullscreen") == 1;
+
+            if (_ratio != m_ratio || _resolution != m_resolution || _fullscreen != m_fullscreen)
+                _ReloadNeeded = true;
+
             m_Hud.EnableCrosshair(m_display_crosshair);
             m_Hud.EnableScore(m_display_score);
             PlayerPrefs.SetInt("DisplayCrosshair", m_display_crosshair ? 1 : 0);
@@ -240,7 +245,8 @@ public class PauseMenu : MonoBehaviour {
             PlayerPrefs.SetInt("AspectRatio", m_ratio);
             PlayerPrefs.SetInt("Resolution", m_resolution);
             PlayerPrefs.SetInt("QualityLevel", quality);
-
+            if (!Application.isWebPlayer && _ReloadNeeded)
+                LoadResolution();
         }
         else if (st.Equals("sound"))
         {
@@ -511,9 +517,7 @@ public class PauseMenu : MonoBehaviour {
         if (submenu == SubMenuSelected.VIDEO_SELECTED)
         {
 
-            LoadFromPlayerPrefs("video");
-
-            GUI.Box(ResizeGUI(new Rect(260, 120, 550, 400)), "Video Settings", skin.box);
+            GUI.Box(ResizeGUI(new Rect(260, 120, 500, 400)), "Video Settings", skin.box);
             GUI.BeginGroup(ResizeGUI(new Rect(310, 120, 500, 600)));
 
             if (!Application.isWebPlayer)

@@ -82,4 +82,9 @@ public class LocalGravityScript : MonoBehaviour {
     {
         return m_Gravity;
     }
+
+    public Vector3 GetGravityDir()
+    {
+        return m_Gravity.normalized;
+    }
 }
